@@ -28,6 +28,11 @@ class Vector(object):
         x, y, z = self.x + other.x, self.y + other.y, self.z + other.z
         return Vector(x, y, z)
 
+    def __div__(self, other):
+        if isinstance(other, (int, long, float)):
+            x, y, z = self.x / other, self.y / other, self.z / other
+            return Vector(x, y, z)
+        raise ValueError('Expected a number, found %s' % type(other))
 
     @property
     def coordinates(self):
