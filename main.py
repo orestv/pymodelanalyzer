@@ -1,29 +1,30 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*
 __author__ = 'seth'
 
-import math
-from geometry.vector import Vector
+from argparse import ArgumentParser
 
-def vector_product(v1, v2):
-    pass
+def parse_options():
+    parser = ArgumentParser(description=u'Обчислення параметрів моделі.')
 
+    parser.add_argument('input_file', type=str,
+                        help=u'Повний шлях до .obj-файла моделі')
+    parser.add_argument('-o', type=str,
+                        help=u'Шлях до файла, куди буде збережно результат.')
+    parser.add_argument('-op', '--observation_point',
+                        type=float, nargs=3, required=True,
+                        metavar=(u'x', u'y', u'z'),
+                        help=u'Координати точки спостереження')
+    parser.add_argument('-ov', '--observation_vector',
+                        type=float, nargs=3,
+                        metavar=(u'x', u'y', u'z'),
+                        help=u'Вектор спостереження')
+
+    args = parser.parse_args()
+    print args
 
 def main():
-
-    v_normal = Vector(1, 1, 1).get_normalized()
-    v_spotter = Vector(50, 0, 0)
-
-    print 'Normal vector length is %s, spotter vector length is %s' % \
-          (v_normal.length, v_spotter.length)
-
-    normalized = v_spotter.get_normalized()
-    print normalized
-
-    print 'Dot product is %d' % (v_normal * v_spotter)
-
-    print 'Angle between vectors is %f' % math.degrees(v_spotter.angle(v_normal))
-
+    parse_options()
 
 if __name__ == '__main__':
     main()
-
-    pass
