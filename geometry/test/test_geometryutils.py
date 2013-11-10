@@ -1,8 +1,7 @@
-from unittest import TestCase
-
 __author__ = 'seth'
 
-import geometry.utils as utils
+from unittest import TestCase
+import geometry.geometryutils as geometryutils
 from geometry.vector import Vector
 from geometry.quad import Quad
 import tempfile
@@ -28,7 +27,7 @@ class TestUtils(TestCase):
         normale = Vector(0, 1, 0)
 
         quad = Quad(vertices, normale)
-        self.assertTrue(utils.is_rectangle(quad))
+        self.assertTrue(geometryutils.is_rectangle(quad))
 
     def test_is_rectangle_fail(self):
         vertices = [Vector(-1, 0, -1),
@@ -38,7 +37,7 @@ class TestUtils(TestCase):
 
         normale = Vector(0, 1, 0)
         quad = Quad(vertices, normale)
-        self.assertFalse(utils.is_rectangle(quad))
+        self.assertFalse(geometryutils.is_rectangle(quad))
 
     def test_middle_perpendiculars(self):
         vertices = [Vector(-1, 0, -1),
@@ -48,7 +47,7 @@ class TestUtils(TestCase):
         normale = Vector(0, 1, 0)
         quad = Quad(vertices, normale)
 
-        d1, d2 = utils.get_middle_perpendiculars(quad)
+        d1, d2 = geometryutils.get_middle_perpendiculars(quad)
 
         self.assertEquals((d1.x, d1.y, d1.z),
                           (0, 0, -2))
