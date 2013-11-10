@@ -5,9 +5,21 @@ __author__ = 'seth'
 import geometry.utils as utils
 from geometry.vector import Vector
 from geometry.quad import Quad
+import tempfile
+import shutil
 
 
 class TestUtils(TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp('pyquadtest')
+        self.addCleanup(self.clean_temp_dir)
+
+    def clean_temp_dir(self):
+        try:
+            shutil.rmtree(self.tempdir)
+        except:
+            print 'Failed to remove tempdir %s' % self.tempdir
+
     def test_is_rectangle(self):
         vertices = [Vector(-1, 0, -1),
                     Vector(2, 0, -1),
