@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 __author__ = 'seth'
 
@@ -6,7 +6,7 @@ from geometry.vector import Vector
 import math
 
 
-class TestVector(TestCase):
+class TestVector(unittest.TestCase):
     def test_is_normalized(self):
         v = Vector(1, 1, 1)
         self.assertFalse(v.is_normalized)
@@ -75,4 +75,10 @@ class TestVector(TestCase):
         self.assertEquals(v, Vector(2, 0, 0))
 
     def test_vector_add(self):
-        pass
+        v1 = Vector(1, 1, 0)
+        v2 = Vector(-1, 1, 0)
+        v = v1 + v2
+        self.assertEquals(v, Vector(0, 2, 0))
+
+if __name__ == '__main__':
+    unittest.main()
