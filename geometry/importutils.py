@@ -2,6 +2,7 @@
 __author__ = 'seth'
 
 from vector import Vector
+from quad import Quad
 
 
 def parse_vertex_line(line):
@@ -23,7 +24,8 @@ def parse_face_line(line):
     vertex_indices = []
     for vertex_data in vertices:
         vertex_index = vertex_data.split('/')[0]
-        vertex_indices.append(int(vertex_index))
+        vertex_index = int(vertex_index)-1  # indices in the file start with 1
+        vertex_indices.append(vertex_index)
     return vertex_indices
 
 
@@ -34,5 +36,16 @@ def import_obj(path):
         for line in objfile:
             if line.startswith('v '):
                 vertices.append(parse_vertex_line(line))
-            elif line.startsWith('f '):
+            elif line.startswith('f '):
                 faces.append(parse_face_line(line))
+    quads = build_quads(vertices, faces)
+    return quads
+
+
+def build_quads(vertices, faces):
+    quads = []
+    for face in faces:
+        quad_vertices = [vertices[i] for i in face]
+        quad = Quad(quad_vertices, normale=None)
+        quads.append(quad)
+    return quads

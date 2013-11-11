@@ -15,3 +15,12 @@ class TestQuad(TestCase):
         quad = Quad(vertices)
         self.assertEquals(quad.normale,
                           Vector(0, 1, 0))
+
+    def test_auto_normale_2(self):
+        vertices = [Vector(5, 4, 3),
+                    Vector(6, 4, 3),
+                    Vector(6, 4, 2),
+                    Vector(5, 4, 2)]
+        quad = Quad(vertices)
+        self.assertEquals(quad.normale,
+                          Vector(0, 1, 0))

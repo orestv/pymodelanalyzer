@@ -7,6 +7,12 @@ import math
 
 
 class TestVector(unittest.TestCase):
+    def test_vectors_not_equal(self):
+        v1 = Vector(1, 1, 1)
+        v2 = Vector(2, 2, 2)
+        self.assertFalse(v1 == v2)
+        self.assertNotEquals(v1, v2)
+
     def test_is_normalized(self):
         v = Vector(1, 1, 1)
         self.assertFalse(v.is_normalized)

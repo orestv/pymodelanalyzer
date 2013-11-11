@@ -12,11 +12,14 @@ class Vector(object):
     def __str__(self):
         return '(%.2f, %.2f, %.2f)' % self.coordinates
 
+    def __repr__(self):
+        return '(%.2f, %.2f, %.2f)' % self.coordinates
+
     def __unicode__(self):
         return unicode(str(self))
 
     def __eq__(self, other):
-        return self.x, self.y, self.z == other.x, other.y, other.z
+        return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __sub__(self, other):
         if isinstance(other, (int, long, float)):
