@@ -37,6 +37,12 @@ class Vector(object):
             return Vector(x, y, z)
         raise ValueError('Expected a number, found %s' % type(other))
 
+    def __mul__(self, number):
+        if not isinstance(number, (int, long, float)):
+            raise ValueError('Expected a number, found %s' % type(number))
+        x, y, z = self.x * number, self.y * number, self.z * number
+        return Vector(x, y, z)
+
     @property
     def coordinates(self):
         return self.x, self.y, self.z
@@ -63,8 +69,9 @@ class Vector(object):
     def scalar_sub(self, number):
         return self.scalar_add(-number)
 
-    def scalar_product(self, other):
-        return self.x * other.x + self.y * other.y + self.z * other.z
+    def dot_product(self, other):
+        result = self.x * other.x + self.y * other.y + self.z * other.z
+        return result
 
     def vector_product(self, other):
         x = self.y*other.z - self.z*other.y
@@ -83,7 +90,7 @@ class Vector(object):
     def angle(self, other):
         if self.length == 0 or other.length == 0:
             raise ValueError('Cannot get angle to zero vector.')
-        angle_cos = self.get_normalized().scalar_product(other.get_normalized())
+        angle_cos = self.get_normalized().dot_product(other.get_normalized())
         if angle_cos == 0:
             result = math.pi / 2
         elif abs(abs(angle_cos) - 1) < 0.001:

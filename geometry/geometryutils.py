@@ -3,10 +3,12 @@ __author__ = 'seth'
 from quad import Quad
 from vector import Vector
 
+
 def is_rectangle(quad):
     v1 = quad.vertices[1] - quad.vertices[2]
     v2 = quad.vertices[0] - quad.vertices[3]
     return v1.angle(v2) == 0 and v1.length == v2.length
+
 
 def get_middle_perpendiculars(quad):
     a = (quad.vertices[0] + quad.vertices[1]) / 2
@@ -19,3 +21,19 @@ def get_middle_perpendiculars(quad):
     return d1, d2
 
 
+def get_center(quad):
+    center = Vector(0, 0, 0)
+    for vertex in quad.vertices:
+        center = center + vertex
+    return center / 4.
+
+
+def get_vector_to_center(vector_from, quad):
+    center = get_center(quad)
+    return center - vector_from
+
+
+def get_projection(vector, vector_project):
+    unit_vector = vector_project.get_normalized()
+    scalar_projection = vector.dot_product(unit_vector)
+    return unit_vector * scalar_projection

@@ -53,3 +53,21 @@ class TestUtils(TestCase):
                           (0, 0, -2))
         self.assertEquals((d2.x, d2.y, d2.z),
                           (2, 0, 0))
+
+    def test_get_center(self):
+        vertices = [Vector(-1, 1, -1),
+                    Vector(1, 1, -1),
+                    Vector(1, 0, 1),
+                    Vector(-1, 0, 1)]
+        quad = Quad(vertices)
+        center = geometryutils.get_center(quad)
+        self.assertEquals(center, Vector(0, 0.5, 0))
+
+    def test_get_projection(self):
+        vector = Vector(1, 0, 0)
+        vector_proj = Vector(1, 1, 0)
+        expected_projection = Vector(0.5, 0.5, 0)
+        projection = geometryutils.get_projection(vector, vector_proj)
+        self.assertAlmostEqual(projection.x, expected_projection.x, 2)
+        self.assertAlmostEqual(projection.y, expected_projection.y, 2)
+        self.assertAlmostEqual(projection.z, expected_projection.z, 2)
