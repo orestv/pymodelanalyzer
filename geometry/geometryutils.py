@@ -1,6 +1,5 @@
 __author__ = 'seth'
 
-from quad import Quad
 from vector import Vector
 
 
@@ -37,3 +36,8 @@ def get_projection(vector, vector_project):
     unit_vector = vector_project.get_normalized()
     scalar_projection = vector.dot_product(unit_vector)
     return unit_vector * scalar_projection
+
+
+def get_projection_onto_plane(vector, quad):
+    vector_normale_part = get_projection(vector, quad.normale)
+    return vector - vector_normale_part

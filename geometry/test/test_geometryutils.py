@@ -1,11 +1,12 @@
 __author__ = 'seth'
 
 from unittest import TestCase
+import tempfile
+import shutil
+
 import geometry.geometryutils as geometryutils
 from geometry.vector import Vector
 from geometry.quad import Quad
-import tempfile
-import shutil
 
 
 class TestUtils(TestCase):
@@ -68,6 +69,32 @@ class TestUtils(TestCase):
         vector_proj = Vector(1, 1, 0)
         expected_projection = Vector(0.5, 0.5, 0)
         projection = geometryutils.get_projection(vector, vector_proj)
+        self.assertAlmostEqual(projection.x, expected_projection.x, 2)
+        self.assertAlmostEqual(projection.y, expected_projection.y, 2)
+        self.assertAlmostEqual(projection.z, expected_projection.z, 2)
+
+    def test_get_projection_onto_plane(self):
+        vertices = [Vector(-1, 2, -1),
+                    Vector(1, 2, -1),
+                    Vector(1, 2, 1),
+                    Vector(-1, 2, 1)]
+        quad = Quad(vertices)
+        vector = Vector(1, 1, 1)
+        expected_projection = Vector(1, 0, 1)
+        projection = geometryutils.get_projection_onto_plane(vector, quad)
+        self.assertAlmostEqual(projection.x, expected_projection.x, 2)
+        self.assertAlmostEqual(projection.y, expected_projection.y, 2)
+        self.assertAlmostEqual(projection.z, expected_projection.z, 2)
+
+    def test_get_projection_onto_diagonal_plane(self):
+        vertices = [Vector(0, 0, -1),
+                    Vector(1, 1, -1),
+                    Vector(1, 1, 1),
+                    Vector(0, 0, 1)]
+        quad = Quad(vertices)
+        vector = Vector(1, 0, 0)
+        expected_projection = Vector(0.5, 0.5, 0)
+        projection = geometryutils.get_projection_onto_plane(vector, quad)
         self.assertAlmostEqual(projection.x, expected_projection.x, 2)
         self.assertAlmostEqual(projection.y, expected_projection.y, 2)
         self.assertAlmostEqual(projection.z, expected_projection.z, 2)
