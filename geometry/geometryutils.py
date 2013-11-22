@@ -32,12 +32,13 @@ def get_vector_to_center(vector_from, quad):
     return center - vector_from
 
 
-def get_projection(vector, vector_project):
+def get_projection_onto_vector(vector, vector_project):
     unit_vector = vector_project.get_normalized()
     scalar_projection = vector.dot_product(unit_vector)
     return unit_vector * scalar_projection
 
 
-def get_projection_onto_plane(vector, quad):
-    vector_normale_part = get_projection(vector, quad.normale)
+def get_projection_onto_plane(vector, plane_normale):
+    plane_normale = plane_normale.get_normalized()
+    vector_normale_part = get_projection_onto_vector(vector, plane_normale)
     return vector - vector_normale_part

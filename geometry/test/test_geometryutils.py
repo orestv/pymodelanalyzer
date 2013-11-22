@@ -68,7 +68,7 @@ class TestUtils(TestCase):
         vector = Vector(1, 0, 0)
         vector_proj = Vector(1, 1, 0)
         expected_projection = Vector(0.5, 0.5, 0)
-        projection = geometryutils.get_projection(vector, vector_proj)
+        projection = geometryutils.get_projection_onto_vector(vector, vector_proj)
         self.assertAlmostEqual(projection.x, expected_projection.x, 2)
         self.assertAlmostEqual(projection.y, expected_projection.y, 2)
         self.assertAlmostEqual(projection.z, expected_projection.z, 2)
@@ -79,9 +79,10 @@ class TestUtils(TestCase):
                     Vector(1, 2, 1),
                     Vector(-1, 2, 1)]
         quad = Quad(vertices)
+        quad_normale = Vector(0, 1, 0)
         vector = Vector(1, 1, 1)
         expected_projection = Vector(1, 0, 1)
-        projection = geometryutils.get_projection_onto_plane(vector, quad)
+        projection = geometryutils.get_projection_onto_plane(vector, quad_normale)
         self.assertAlmostEqual(projection.x, expected_projection.x, 2)
         self.assertAlmostEqual(projection.y, expected_projection.y, 2)
         self.assertAlmostEqual(projection.z, expected_projection.z, 2)
@@ -92,9 +93,10 @@ class TestUtils(TestCase):
                     Vector(1, 1, 1),
                     Vector(0, 0, 1)]
         quad = Quad(vertices)
+        quad_normale = Vector(1, -1, 0)
         vector = Vector(1, 0, 0)
         expected_projection = Vector(0.5, 0.5, 0)
-        projection = geometryutils.get_projection_onto_plane(vector, quad)
+        projection = geometryutils.get_projection_onto_plane(vector, quad_normale)
         self.assertAlmostEqual(projection.x, expected_projection.x, 2)
         self.assertAlmostEqual(projection.y, expected_projection.y, 2)
         self.assertAlmostEqual(projection.z, expected_projection.z, 2)
