@@ -6,6 +6,7 @@ import mox
 from processing import processor
 from geometry.vector import Vector
 from geometry.triangle import RightTriangle
+from geometry import geometryutils
 
 
 class TestProcessor(unittest.TestCase):
@@ -19,10 +20,26 @@ class TestProcessor(unittest.TestCase):
         self.fail('Not implemented yet')
 
     def test_get_triangle_leg_angles(self):
-        self.fail('Not implemented yet')
+        self.mox.StubOutWithMock(geometryutils, 'get_projection_onto_plane')
+        self.mox.StubOutWithMock(geometryutils, 'sharp_angle')
+
+        geometryutils.get_projection_onto_plane(Vector(-1, -1, -1),
+                                                Vector(1, 0, 0)).AndReturn(Vector(99, 0, 0))
+        geometryutils.sharp_angle(Vector(99, 0, 0),
+                                  Vector(0, 1, 0)).AndReturn(50)
+        geometryutils.sharp_angle(Vector(-1, -1, -1),
+                                  Vector(99, 0, 0)).AndReturn(-50)
+
+        self.mox.ReplayAll()
+        angles = processor.get_triangle_leg_angles(Vector(0, 1, 0),
+                                                   Vector(-1, -1, -1),
+                                                   Vector(1, 0, 0))
+        self.mox.VerifyAll()
+
+        self.assertDictEqual(angles, {'alpha': 50, 'beta': -50})
+
 
     def test_process_triangle(self):
-        mock = self.mox.CreateMock(processor)
         self.mox.StubOutWithMock(processor, 'get_triangle_leg_angles')
         self.mox.StubOutWithMock(processor, 'get_f')
 

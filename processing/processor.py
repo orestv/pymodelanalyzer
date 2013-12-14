@@ -2,13 +2,17 @@ __author__ = 'seth'
 
 import math
 
+from geometry import geometryutils
+
 VECTOR_EQUALITY_EPS = 0.1
 
 
 def get_triangle_leg_angles(triangle_normale, view_vector, plane_normale):
-    angles = {'alpha': 0, 'beta': 0}
+    view_vector_projection = geometryutils.get_projection_onto_plane(view_vector, plane_normale)
+    alpha = geometryutils.sharp_angle(view_vector_projection, triangle_normale)
+    beta = geometryutils.sharp_angle(view_vector, view_vector_projection)
 
-    return angles
+    return {'alpha': alpha, 'beta': beta}
 
 
 def get_f(alpha, beta, a, b, wavelength):
