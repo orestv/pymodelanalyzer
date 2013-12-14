@@ -9,6 +9,9 @@ class Vector(object):
         self.y = y
         self.z = z
 
+    def __lt__(self, other):
+        return self.length < other.length
+
     def __str__(self):
         return '(%.2f, %.2f, %.2f)' % self.coordinates
 
