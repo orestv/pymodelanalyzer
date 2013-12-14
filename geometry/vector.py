@@ -1,7 +1,5 @@
 __author__ = 'seth'
 
-import math
-
 
 class Vector(object):
     def __init__(self, x, y, z):
@@ -52,7 +50,7 @@ class Vector(object):
 
     @property
     def length(self):
-        len_square = self.x*self.x + self.y*self.y + self.z*self.z
+        len_square = self.x * self.x + self.y * self.y + self.z * self.z
         return pow(len_square, 0.5)
 
     @property
@@ -62,7 +60,7 @@ class Vector(object):
     def get_normalized(self):
         if self.length == 0:
             raise ValueError("Cannot normalize zero vector.")
-        x, y, z = self.x/self.length, self.y/self.length, self.z/self.length
+        x, y, z = self.x / self.length, self.y / self.length, self.z / self.length
         return Vector(x, y, z)
 
     def scalar_add(self, number):
@@ -77,9 +75,9 @@ class Vector(object):
         return result
 
     def vector_product(self, other):
-        x = self.y*other.z - self.z*other.y
-        y = self.z*other.x - self.x*other.z
-        z = self.x*other.y - self.y*other.x
+        x = self.y * other.z - self.z * other.y
+        y = self.z * other.x - self.x * other.z
+        z = self.x * other.y - self.y * other.x
         return Vector(x, y, z)
 
     def vector_add(self, other):
@@ -89,15 +87,3 @@ class Vector(object):
     def vector_sub(self, other):
         x, y, z = self.x - other.x, self.y - other.y, self.z - other.z
         return Vector(x, y, z)
-
-    def angle(self, other):
-        if self.length == 0 or other.length == 0:
-            raise ValueError('Cannot get angle to zero vector.')
-        angle_cos = self.get_normalized().dot_product(other.get_normalized())
-        if angle_cos == 0:
-            result = math.pi / 2
-        elif abs(abs(angle_cos) - 1) < 0.001:
-            result = 0
-        else:
-            result = math.acos(angle_cos)
-        return result

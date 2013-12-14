@@ -2,6 +2,7 @@ __author__ = 'seth'
 
 from unittest import TestCase
 import tempfile
+import math
 import shutil
 
 import geometry.geometryutils as geometryutils
@@ -90,3 +91,22 @@ class TestUtils(TestCase):
         self.assertAlmostEqual(projection.x, expected_projection.x, 2)
         self.assertAlmostEqual(projection.y, expected_projection.y, 2)
         self.assertAlmostEqual(projection.z, expected_projection.z, 2)
+
+    def test_angle(self):
+        a = geometryutils.angle(Vector(1, 0, 0), Vector(1, 1, 0))
+        self.assertAlmostEquals(a, math.pi / 4.)
+
+        a = geometryutils.angle(Vector(1, 0, 0), Vector(-1, -1, 0))
+        self.assertAlmostEqual(a, 3 * math.pi / 4)
+
+    def test_angle_parallel(self):
+        a = geometryutils.angle(Vector(1, 0, 0), Vector(2, 0, 0))
+        self.assertEquals(a, 0)
+
+    def test_angle_perpendicular(self):
+        a = geometryutils.angle(Vector(1, 0, 0), Vector(0, 1, 0))
+        self.assertEquals(a, math.pi / 2)
+
+    def test_sharp_angle(self):
+        a = geometryutils.sharp_angle(Vector(1, 0, 0), Vector(-1, -1, 0))
+        self.assertAlmostEqual(a, math.pi / 4)

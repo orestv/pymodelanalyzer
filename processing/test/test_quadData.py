@@ -12,20 +12,24 @@ from processing.quaddata import QuadData
 
 
 class TestQuadData(TestCase):
-    @patch.multiple(QuadData, check_data=sentinel.DEFAULT,
+    @patch('geometry.geometryutils.get_vector_to_center')
+    @patch.multiple(QuadData,
                     get_perpendicular_angle=sentinel.DEFAULT,
                     process_normale_angle=sentinel.DEFAULT,
                     process_distance=sentinel.DEFAULT,
                     process_sizes=sentinel.DEFAULT)
-    def test_process(self, check_data,
+    def test_process(self,
+                     get_vector_to_center,
                      get_perpendicular_angle,
                      process_normale_angle,
                      process_distance,
                      process_sizes):
         qd = QuadData(None, None)
+        qd.process()
 
-        assert qd.check_data.called
+        #assert qd.check_data.called
 
+        assert get_vector_to_center.called
         assert qd.get_perpendicular_angle.called
         assert qd.process_normale_angle.called
         assert qd.process_distance.called

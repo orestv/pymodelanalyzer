@@ -3,7 +3,6 @@ import unittest
 __author__ = 'seth'
 
 from geometry.vector import Vector
-import math
 
 
 class TestVector(unittest.TestCase):
@@ -32,29 +31,6 @@ class TestVector(unittest.TestCase):
 
         v = Vector(0, 0, 0)
         self.assertRaises(ValueError, v.get_normalized)
-
-    def test_angle(self):
-        v1 = Vector(1, 0, 0)
-        v2 = Vector(0, 1, 0)
-        angle = v1.angle(v2)
-        self.assertAlmostEqual(angle, math.pi/2., 3)
-
-    def test_parallel_vectors_angle(self):
-        v1 = Vector(1, 1, 1)
-        v2 = Vector(3, 3, 3)
-        angle = v1.angle(v2)
-        self.assertEquals(angle, 0)
-
-    def test_zero_vector_angle(self):
-        v1 = Vector(0, 0, 0)
-        v2 = Vector(1, 0, 0)
-        self.assertRaises(ValueError, v1.angle, v2)
-
-    def test_negative_vector_angle(self):
-        v1 = Vector(0, 1, 0)
-        v2 = Vector(-1, -1, 0)
-        angle = v1.angle(v2)
-        self.assertAlmostEquals(angle, 3*math.pi/4, 3)
 
     def test_vector_product(self):
         v1 = Vector(1, 0, 0)
@@ -85,6 +61,7 @@ class TestVector(unittest.TestCase):
         v2 = Vector(-1, 1, 0)
         v = v1 + v2
         self.assertEquals(v, Vector(0, 2, 0))
+
 
 if __name__ == '__main__':
     unittest.main()
