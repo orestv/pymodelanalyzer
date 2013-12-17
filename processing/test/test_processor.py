@@ -2,6 +2,7 @@ __author__ = 'seth'
 
 import unittest
 import mox
+import math
 
 from processing import processor
 from geometry.vector import Vector
@@ -17,7 +18,13 @@ class TestProcessor(unittest.TestCase):
         self.mox.UnsetStubs()
 
     def test_get_f(self):
-        self.fail('Not implemented yet')
+        alpha = math.pi / 4
+        beta = math.pi / 4
+        a = 0.2
+        b = 0.6
+        wavelength = 0.1
+        f = processor.get_f(alpha, beta, a, b, wavelength)
+        self.assertAlmostEqual(f, 1.002 * 10**(-8))
 
     def test_get_triangle_leg_angles(self):
         self.mox.StubOutWithMock(geometryutils, 'get_projection_onto_plane')

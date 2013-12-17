@@ -16,8 +16,7 @@ def get_triangle_leg_angles(triangle_normale, view_vector, plane_normale):
 
 
 def get_f(alpha, beta, a, b, wavelength):
-    print a, b, wavelength
-    sigma = 4 * math.pi * (a ** 2) * (b ** 2) / (wavelength ** 2)
+    sigma = 4 * math.pi * (a ** 2) * (b ** 2) * (wavelength ** 2)
     k = 2 * math.pi / wavelength
 
     f = (sigma * (math.cos(alpha) * math.cos(beta)) ** 2 /
