@@ -24,7 +24,7 @@ class TestProcessor(unittest.TestCase):
         b = 0.6
         wavelength = 0.1
         f = processor.get_f(alpha, beta, a, b, wavelength)
-        self.assertAlmostEqual(f, 1.002 * 10**(-8))
+        self.assertAlmostEqual(f, 1.002 * 10**(-5))
 
     def test_get_triangle_leg_angles(self):
         self.mox.StubOutWithMock(geometryutils, 'get_projection_onto_plane')
