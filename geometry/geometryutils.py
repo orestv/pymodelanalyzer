@@ -1,12 +1,14 @@
 __author__ = 'seth'
 
+import math
+
 from vector import Vector
 
 
 def is_rectangle(quad):
     v1 = quad.vertices[1] - quad.vertices[2]
     v2 = quad.vertices[0] - quad.vertices[3]
-    return v1.angle(v2) == 0 and v1.length == v2.length
+    return angle(v1, v2) == 0 and v1.length == v2.length
 
 
 def get_middle_perpendiculars(quad):
@@ -39,6 +41,25 @@ def get_projection_onto_vector(vector, vector_project):
 
 
 def get_projection_onto_plane(vector, plane_normale):
-    plane_normale = plane_normale.get_normalized()
     vector_normale_part = get_projection_onto_vector(vector, plane_normale)
     return vector - vector_normale_part
+
+
+def angle(v1, v2):
+    if v1.length == 0 or v2.length == 0:
+        raise ValueError('Cannot get angle to zero vector.')
+    angle_cos = v1.get_normalized().dot_product(v2.get_normalized())
+    if angle_cos == 0:
+        result = math.pi / 2
+    elif abs(abs(angle_cos) - 1) < 0.001:
+        result = 0
+    else:
+        result = math.acos(angle_cos)
+    return result
+
+
+def sharp_angle(v1, v2):
+    a = angle(v1, v2)
+    if a > math.pi / 2:
+        a = math.pi - a
+    return a
