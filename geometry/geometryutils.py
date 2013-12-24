@@ -3,6 +3,7 @@ __author__ = 'seth'
 import math
 
 from vector import Vector
+from geometry.triangle import RightTriangle
 
 
 def is_rectangle(quad):
@@ -35,7 +36,7 @@ def get_vector_to_center(vector_from, quad):
 
 
 def get_projection_onto_vector(vector, vector_project):
-    unit_vector = vector_project.get_normalized()
+    unit_vector = vector_project.unit()
     scalar_projection = vector.dot_product(unit_vector)
     return unit_vector * scalar_projection
 
@@ -48,7 +49,7 @@ def get_projection_onto_plane(vector, plane_normale):
 def angle(v1, v2):
     if v1.length == 0 or v2.length == 0:
         raise ValueError('Cannot get angle to zero vector.')
-    angle_cos = v1.get_normalized().dot_product(v2.get_normalized())
+    angle_cos = v1.unit().dot_product(v2.unit())
     if angle_cos == 0:
         result = math.pi / 2
     elif abs(abs(angle_cos) - 1) < 0.001:
@@ -63,3 +64,38 @@ def sharp_angle(v1, v2):
     if a > math.pi / 2:
         a = math.pi - a
     return a
+
+
+def find_longest_side(vertices):
+    vertices = vertices + [vertices[0]]
+    pairwise = ((vertices[i], vertices[i + 1]) for i in range(3))
+    v1_out, v2_out, max_len = None, None, None
+    for v1, v2 in pairwise:
+        l = (v2 - v1).length
+        if l > max_len:
+            v1_out, v2_out = v1, v2
+            max_len = l
+    return v1_out, v2_out
+
+
+def split_triangle(vertices):
+    v1, v2 = find_longest_side(vertices)
+    perp_base = None
+    for v in vertices:
+        if v not in (v1, v2):
+            perp_base = v
+            break
+    hippotenuse = perp_base - v1
+    a = angle(hippotenuse, v2 - v1)
+    v_unit = (v2 - v1).unit()
+    leg = v_unit * (math.cos(a) * hippotenuse.length)
+
+    right_angle_vertex = v1 + leg
+
+    t1 = RightTriangle(right_angle_vertex,
+                       perp_base - right_angle_vertex,
+                       v1 - right_angle_vertex)
+    t2 = RightTriangle(right_angle_vertex,
+                       v2 - right_angle_vertex,
+                       perp_base - right_angle_vertex)
+    return t1, t2

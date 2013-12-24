@@ -57,7 +57,7 @@ class Vector(object):
     def is_normalized(self):
         return self.length == 1
 
-    def get_normalized(self):
+    def unit(self):
         if self.length == 0:
             raise ValueError("Cannot normalize zero vector.")
         x, y, z = self.x / self.length, self.y / self.length, self.z / self.length

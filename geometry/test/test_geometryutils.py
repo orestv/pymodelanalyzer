@@ -4,16 +4,22 @@ from unittest import TestCase
 import tempfile
 import math
 import shutil
+import mox
 
 import geometry.geometryutils as geometryutils
 from geometry.vector import Vector
 from geometry.quad import Quad
+from geometry.triangle import RightTriangle
 
 
 class TestUtils(TestCase):
     def setUp(self):
         self.tempdir = tempfile.mkdtemp('pyquadtest')
         self.addCleanup(self.clean_temp_dir)
+        self.mox = mox.Mox()
+
+    def tearDown(self):
+        self.mox.UnsetStubs()
 
     def clean_temp_dir(self):
         try:
@@ -110,3 +116,32 @@ class TestUtils(TestCase):
     def test_sharp_angle(self):
         a = geometryutils.sharp_angle(Vector(1, 0, 0), Vector(-1, -1, 0))
         self.assertAlmostEqual(a, math.pi / 4)
+
+    def test_find_longest_side(self):
+        vertices = [Vector(0, 2, 0),
+                    Vector(10, 2, 0),
+                    Vector(0, 0, 0)]
+        v1_expected = Vector(10, 2, 0)
+        v2_expected = Vector(0, 0, 0)
+
+        v1, v2 = geometryutils.find_longest_side(vertices)
+
+        self.assertEquals(v1, v1_expected)
+        self.assertEquals(v2, v2_expected)
+
+    def test_split_triangle(self):
+
+        vertices = [Vector(0, 0, 0),
+                    Vector(15, 0, 0),
+                    Vector(13, 2, 0)]
+        t1_expected = RightTriangle(Vector(13, 0, 0),
+                                    Vector(0, 2, 0),
+                                    Vector(-13, 0, 0))
+        t2_expected = RightTriangle(Vector(13, 0, 0),
+                                    Vector(2, 0, 0),
+                                    Vector(0, 2, 0))
+
+        t1, t2 = geometryutils.split_triangle(vertices)
+
+        self.assertEquals(t1, t1_expected)
+        self.assertEquals(t2, t2_expected)
