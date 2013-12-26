@@ -3,6 +3,7 @@ __author__ = 'seth'
 
 from vector import Vector
 from quad import Quad
+import geometryutils
 
 
 def parse_vertex_line(line):
@@ -38,8 +39,11 @@ def import_obj(path):
                 vertices.append(parse_vertex_line(line))
             elif line.startswith('f '):
                 faces.append(parse_face_line(line))
-    quads = build_quads(vertices, faces)
-    return quads
+    triangles = []
+    for face in faces:
+        face_vertices = [vertices[i] for i in face]
+        triangles += geometryutils.build_triangles(face_vertices)
+    return triangles
 
 
 def build_quads(vertices, faces):

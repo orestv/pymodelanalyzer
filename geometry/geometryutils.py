@@ -128,3 +128,14 @@ def build_triangles(vertices):
         v2 = [vertices[i] for i in [0, 2, 3]]
         result = build_triangles(v1) + build_triangles(v2)
     return result
+
+
+def is_triangle_visible(triangle, viewpoint):
+    view_vector = triangle.vertex - viewpoint
+    view_angle = angle(view_vector, triangle.normale)
+    return view_angle < math.pi / 2
+
+
+def get_visible_triangles(triangles, viewpoint):
+    result = filter(lambda x: is_triangle_visible(x, viewpoint), triangles)
+    return result

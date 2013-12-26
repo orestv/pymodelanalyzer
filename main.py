@@ -4,6 +4,8 @@ __author__ = 'seth'
 
 from argparse import ArgumentParser
 from geometry import importutils
+from geometry import geometryutils
+from geometry.vector import Vector
 
 
 def parse_options():
@@ -25,10 +27,13 @@ def parse_options():
     args = parser.parse_args()
     return args
 
+
 def main():
     args = parse_options()
+    viewpoint = args.observation_point
+    viewpoint = Vector(*viewpoint)
     triangles = importutils.import_obj(args.input_file)
-    print triangles
+    visible_triangles = geometryutils.get_visible_triangles(triangles, viewpoint)
 
 
 if __name__ == '__main__':
