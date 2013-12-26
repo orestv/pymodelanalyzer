@@ -99,3 +99,18 @@ def split_triangle(vertices):
                        v2 - right_angle_vertex,
                        perp_base - right_angle_vertex)
     return t1, t2
+
+
+def find_right_triangle_vertex(vertices):
+    for vertex in vertices:
+        other_vertices = [v for v in vertices if v != vertex]
+        vectors = [v - vertex for v in other_vertices]
+        a = angle(*vectors)
+        if abs(math.pi / 2 - a) < 0.01:
+            return vertex
+    return None
+
+
+def build_triangles(vertices):
+    if len(vertices) == 3:
+        pass

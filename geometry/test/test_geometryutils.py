@@ -145,3 +145,19 @@ class TestUtils(TestCase):
 
         self.assertEquals(t1, t1_expected)
         self.assertEquals(t2, t2_expected)
+
+    def test_find_right_triangle_vertex(self):
+        vertices = [Vector(0, 0, 0),
+                    Vector(15, 0, 0),
+                    Vector(13, 2, 0)]
+        v = geometryutils.find_right_triangle_vertex(vertices)
+        self.assertEquals(v, None)
+
+        vertices = [Vector(0, 0, 0),
+                    Vector(15, 0, 0),
+                    Vector(0, 2, 0)]
+        v = geometryutils.find_right_triangle_vertex(vertices)
+        self.assertEquals(v, Vector(0, 0, 0))
+
+    def test_build_triangles(self):
+        self.fail('Not implemented yet')
