@@ -4,7 +4,7 @@ __author__ = 'seth'
 
 from argparse import ArgumentParser
 from geometry import importutils
-from geometry import geometryutils
+
 
 def parse_options():
     parser = ArgumentParser(description=u'Обчислення параметрів моделі.')
@@ -27,10 +27,8 @@ def parse_options():
 
 def main():
     args = parse_options()
-    quads = importutils.import_obj(args.input_file)
-    for quad in quads:
-        if not geometryutils.is_rectangle(quad):
-            print u'Не квадрат: %s' % quad
+    triangles = importutils.import_obj(args.input_file)
+    print triangles
 
 
 if __name__ == '__main__':
