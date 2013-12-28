@@ -7,6 +7,9 @@ import sys
 from vector import Vector
 import geometryutils
 
+logger = logging.getLogger('ImportUtils')
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 
 def parse_vertex_line(line):
     coordinates = line.split()[1:]  # skip "v "
@@ -24,6 +27,8 @@ def parse_vertex_line(line):
 def parse_face_line(line):
     vertices = line.split()[1:]    # skip "f "
     vertex_indices = []
+    if len(vertices) < 3:
+        raise ValueError('Рядок %s містить недостатньо вершин.' % line)
     for vertex_data in vertices:
         vertex_index = vertex_data.split('/')[0]
         vertex_index = int(vertex_index)-1  # indices in the file start with 1
@@ -32,8 +37,6 @@ def parse_face_line(line):
 
 
 def get_faces(path):
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler(sys.stdout))
     vertices = []
     faces = []
     with open(path, 'r') as objfile:
@@ -55,7 +58,7 @@ def build_triangles(faces, notify_func=None):
         if notify_func:
             processed_faces += 1
             if processed_faces % 100 == 0:
-                percentage = processed_faces / len(faces) * 100
+                percentage = float(processed_faces) / len(faces) * 100
                 notify_func(percentage)
         triangles += geometryutils.build_triangles(face)
     return triangles

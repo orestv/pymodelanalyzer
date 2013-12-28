@@ -104,6 +104,9 @@ def split_triangle(vertices):
 def find_right_triangle_vertex(vertices):
     for vertex in vertices:
         other_vertices = [v for v in vertices if v != vertex]
+        if len(other_vertices) < 2:
+            print vertices
+            raise ValueError('WTF?')
         vectors = [v - vertex for v in other_vertices]
         a = angle(*vectors)
         if abs(math.pi / 2 - a) < 0.01:
@@ -112,22 +115,28 @@ def find_right_triangle_vertex(vertices):
 
 
 def build_triangles(vertices):
-    result = []
-    if len(vertices) == 3:
-        right_triangle_vertex = find_right_triangle_vertex(vertices)
-        if right_triangle_vertex:
-            other_vertices = [v for v in vertices if v != right_triangle_vertex]
-            legs = [v - right_triangle_vertex for v in other_vertices]
-            triangle = RightTriangle(right_triangle_vertex, *legs)
-            result.append(triangle)
-        else:
-            triangles = split_triangle(vertices)
-            result.extend(triangles)
-    elif len(vertices) == 4:
-        v1 = [vertices[i] for i in [0, 1, 2]]
-        v2 = [vertices[i] for i in [0, 2, 3]]
-        result = build_triangles(v1) + build_triangles(v2)
-    return result
+    try:
+        result = []
+        if len(vertices) == 3:
+            if len(set(vertices)) != 3:
+                # TODO: log failure.
+                return result
+            right_triangle_vertex = find_right_triangle_vertex(vertices)
+            if right_triangle_vertex:
+                other_vertices = [v for v in vertices if v != right_triangle_vertex]
+                legs = [v - right_triangle_vertex for v in other_vertices]
+                triangle = RightTriangle(right_triangle_vertex, *legs)
+                result.append(triangle)
+            else:
+                triangles = split_triangle(vertices)
+                result.extend(triangles)
+        elif len(vertices) == 4:
+            v1 = [vertices[i] for i in [0, 1, 2]]
+            v2 = [vertices[i] for i in [0, 2, 3]]
+            result = build_triangles(v1) + build_triangles(v2)
+        return result
+    except KeyboardInterrupt:
+        return []
 
 
 def is_triangle_visible(triangle, viewpoint):

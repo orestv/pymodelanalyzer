@@ -28,6 +28,7 @@ class TestImportUtils(TestCase):
         expected_coords = [BigFloat(0.2, precision(50)),
                            BigFloat(0.5, precision(50)),
                            BigFloat(0.3, precision(50))]
+        expected_coords = [0.2, 0.5, 0.3]
         expected_vector = geometry.vector.Vector(*expected_coords)
         v = importutils.parse_vertex_line('v 0.2 0.5 0.3')
         self.assertEquals(v, expected_vector)

@@ -4,12 +4,13 @@ __author__ = 'seth'
 
 from argparse import ArgumentParser
 import sys
-
-from bigfloat import BigFloat
+from multiprocessing import Pool
+from itertools import chain
 
 from geometry import importutils
 from processing import processor
 from geometry.vector import Vector
+from geometry import geometryutils
 
 
 def parse_options():
@@ -18,7 +19,7 @@ def parse_options():
     parser.add_argument('input_file', type=str,
                         help=u'Повний шлях до .obj-файла моделі')
     parser.add_argument('-w', '--wavelength',
-                        type=BigFloat, required=True,
+                        type=float, required=True,
                         help=u'Довжина хвилі')
     parser.add_argument('-op', '--observation_point',
                         type=float, nargs=3, required=True,
@@ -52,7 +53,18 @@ def main():
     print 'Кількість вершин: %d, кількість примітивів: %d' % (vertex_count, face_count)
     faces = importutils.get_faces(args.input_file)
     print 'Файл імпортовано.'
-    triangles = importutils.build_triangles(faces, generate_notify_func('Обробка трикутників...'))
+
+    pool = Pool(4)
+
+    try:
+        result = pool.map_async(geometryutils.build_triangles, faces, 10000)
+    except KeyboardInterrupt:
+        pool.terminate()
+        print 'Програму зупинено'
+        return
+    triangles = result.get()
+    triangles = chain.from_iterable(triangles)
+
     print 'Трикутники згенеровано.'
 
     processor.write_triangles_data(triangles, viewpoint, args.wavelength, args.output_file)
