@@ -3,6 +3,9 @@
 __author__ = 'seth'
 
 from argparse import ArgumentParser
+
+from bigfloat import BigFloat
+
 from geometry import importutils
 from geometry import geometryutils
 from geometry.vector import Vector
@@ -13,16 +16,15 @@ def parse_options():
 
     parser.add_argument('input_file', type=str,
                         help=u'Повний шлях до .obj-файла моделі')
-    parser.add_argument('-o', '--output_file', type=str,
-                        help=u'Шлях до файла, куди буде збережно результат.')
+    parser.add_argument('-w', '--wavelength',
+                        type=BigFloat, required=True,
+                        help=u'Довжина хвилі')
     parser.add_argument('-op', '--observation_point',
                         type=float, nargs=3, required=True,
                         metavar=(u'x', u'y', u'z'),
                         help=u'Координати точки спостереження')
-    parser.add_argument('-ov', '--observation_vector',
-                        type=float, nargs=3,
-                        metavar=(u'x', u'y', u'z'),
-                        help=u'Вектор спостереження')
+    parser.add_argument('-o', '--output_file', type=str,
+                        help=u'Шлях до файла, куди буде збережно результат.')
 
     args = parser.parse_args()
     return args
