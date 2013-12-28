@@ -11,19 +11,17 @@ import geometryutils
 def parse_vertex_line(line):
     coordinates = line.split()[1:]  # skip "v "
     if len(coordinates) != 3:
-        raise ValueError(u'Точка %s містить недостатньо координат!' % line)
+        raise ValueError('Точка %s містить невірну кількість координат!' % line)
     x, y, z = coordinates
     try:
         x, y, z = map(lambda s: BigFloat.exact(s, precision=50), (x, y, z))
     except ValueError:
-        raise ValueError(u'Невірний формат числа в рядку %s' % line)
+        raise ValueError('Невірний формат числа в рядку %s' % line)
     return Vector(x, y, z)
 
 
 def parse_face_line(line):
     vertices = line.split()[1:]    # skip "f "
-    if len(vertices) != 4:
-        raise ValueError(u'Примітив %s - не чотирикутник!' % line)
     vertex_indices = []
     for vertex_data in vertices:
         vertex_index = vertex_data.split('/')[0]
