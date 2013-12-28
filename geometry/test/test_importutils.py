@@ -74,7 +74,7 @@ class TestImportUtils(TestCase):
 
         importutils.build_quads = mock.MagicMock()
 
-        quads = importutils.import_obj(path)
+        quads = importutils.get_faces(path)
 
         importutils.build_quads.assert_called_with(expected_vertices, expected_faces)
 

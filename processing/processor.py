@@ -1,5 +1,6 @@
 __author__ = 'seth'
 
+import os
 import math
 
 from geometry import geometryutils
@@ -66,3 +67,10 @@ def process_triangle(viewpoint, wavelength, triangle):
 
     return result
 
+
+def write_triangles_data(triangles, viewpoint, wavelength, output_path):
+    data = (process_triangle(viewpoint, wavelength, t) for t in triangles)
+    string_output = ['%.8f,%.8f,%.8f,%.8f,%.8f%s' % (d['a'], d['b'], d['alpha'], d['beta'], d['f'], os.linesep) for d in
+                     data]
+    with open(output_path, 'w') as output_file:
+        output_file.writelines(string_output)

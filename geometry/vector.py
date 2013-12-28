@@ -1,6 +1,6 @@
 __author__ = 'seth'
 
-from bigfloat import *
+from bigfloat import BigFloat
 
 
 class Vector(object):
@@ -8,6 +8,7 @@ class Vector(object):
         self.x = x
         self.y = y
         self.z = z
+        self._length = self.__length
 
     def __lt__(self, other):
         return self.length < other.length
@@ -51,9 +52,13 @@ class Vector(object):
         return self.x, self.y, self.z
 
     @property
-    def length(self):
+    def __length(self):
         len_square = self.x * self.x + self.y * self.y + self.z * self.z
         return pow(len_square, 0.5)
+
+    @property
+    def length(self):
+        return self._length
 
     @property
     def is_normalized(self):
