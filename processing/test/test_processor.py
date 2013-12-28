@@ -3,6 +3,7 @@ __author__ = 'seth'
 import unittest
 import mox
 import math
+from bigfloat import BigFloat
 
 from processing import processor
 from geometry.vector import Vector
@@ -20,9 +21,9 @@ class TestProcessor(unittest.TestCase):
     def test_get_f(self):
         alpha = math.pi / 4
         beta = math.pi / 4
-        a = 0.2
-        b = 0.6
-        wavelength = 0.1
+        a = BigFloat.exact(0.2)
+        b = BigFloat.exact(0.6)
+        wavelength = BigFloat.exact(0.1)
         f = processor.get_f(alpha, beta, a, b, wavelength)
         self.assertAlmostEqual(f, 1.002 * 10 ** (-5))
 

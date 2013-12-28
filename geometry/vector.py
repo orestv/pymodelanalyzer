@@ -1,5 +1,7 @@
 __author__ = 'seth'
 
+from bigfloat import *
+
 
 class Vector(object):
     def __init__(self, x, y, z):
@@ -33,13 +35,13 @@ class Vector(object):
         return Vector(x, y, z)
 
     def __div__(self, other):
-        if isinstance(other, (int, long, float)):
+        if isinstance(other, (int, long, float, BigFloat)):
             x, y, z = self.x / other, self.y / other, self.z / other
             return Vector(x, y, z)
         raise ValueError('Expected a number, found %s' % type(other))
 
     def __mul__(self, number):
-        if not isinstance(number, (int, long, float)):
+        if not isinstance(number, (int, long, float, BigFloat)):
             raise ValueError('Expected a number, found %s' % type(number))
         x, y, z = self.x * number, self.y * number, self.z * number
         return Vector(x, y, z)

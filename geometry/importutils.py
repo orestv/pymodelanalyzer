@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*
 __author__ = 'seth'
 
+from bigfloat import BigFloat
+
 from vector import Vector
 from quad import Quad
 import geometryutils
@@ -12,7 +14,7 @@ def parse_vertex_line(line):
         raise ValueError(u'Точка %s містить недостатньо координат!' % line)
     x, y, z = coordinates
     try:
-        x, y, z = float(x), float(y), float(z)
+        x, y, z = map(lambda s: BigFloat.exact(s, precision=50), (x, y, z))
     except ValueError:
         raise ValueError(u'Невірний формат числа в рядку %s' % line)
     return Vector(x, y, z)
