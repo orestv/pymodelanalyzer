@@ -1,4 +1,6 @@
 class RightTriangle(object):
+    __slots__ = ('vertex', 'leg_1', 'leg_2')
+
     def __init__(self, vertex, leg_1, leg_2):
         self.vertex = vertex
         self.leg_1 = leg_1
