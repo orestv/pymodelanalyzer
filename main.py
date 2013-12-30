@@ -49,7 +49,7 @@ def main():
 
     pool = Pool(args.jobs)
     try:
-        result = pool.map_async(geometryutils.build_triangles, faces[:10], 10000)
+        result = pool.map_async(geometryutils.build_triangles, faces, 10000)
     except KeyboardInterrupt:
         pool.terminate()
         print 'Program stopped.'
