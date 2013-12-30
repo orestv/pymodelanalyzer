@@ -9,6 +9,7 @@ from geometry import geometryutils
 VECTOR_EQUALITY_EPS = 0.001
 
 logger = logging.getLogger('processor')
+logger.addHandler(logging.FileHandler('processor.log'))
 
 
 def get_triangle_leg_angles(triangle_normale, view_vector, plane_normale):
@@ -61,7 +62,7 @@ def process_triangle(viewpoint, wavelength, triangle):
         angles = angles_2
 
     if angles['alpha'] == 0 or angles['beta'] == 0:
-        raise ValueError('Failed to process triangle %s; angles: %s' % (triangle, angles))
+        raise ValueError('Triangle %s is perpendicular to view vector.' % triangle)
 
     a = min(triangle.leg_1.length, triangle.leg_2.length)
     b = max(triangle.leg_1.length, triangle.leg_2.length)
@@ -79,15 +80,19 @@ def process_triangle(viewpoint, wavelength, triangle):
     return result
 
 
-def write_triangles_data(triangles, viewpoint, wavelength, output_path):
-    data = []
-    for triangle in triangles:
-        try:
-            data += process_triangle(viewpoint, wavelength, triangle)
-        except ValueError as ex:
-            logger.warn('Failed to process triangle %s: %s', triangle, ex)
+def try_process_triangle(args):
+    triangle, viewpoint, wavelength = args
+    data = None
+    try:
+        data = process_triangle(viewpoint, wavelength, triangle)
+    except ValueError as ex:
+        logger.warn('Failed to process triangle %s: %s', triangle, ex)
+    return data
 
-    string_output = ['%.8f,%.8f,%.8f,%.8f,%.8f%s' % (d['a'], d['b'], d['alpha'], d['beta'], d['f'], os.linesep) for d in
-                     data]
-    with open(output_path, 'w') as output_file:
+
+def write_triangles_data(data, path):
+    string_output = ['%.8f,%.8f,%.8f,%.8f,%.8f%s' % (d['a'], d['b'], d['alpha'], d['beta'], d['f'], os.linesep)
+                     for d in data]
+    with open(path, 'w') as output_file:
         output_file.writelines(string_output)
+

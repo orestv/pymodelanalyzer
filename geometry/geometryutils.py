@@ -50,9 +50,10 @@ def angle(v1, v2):
     if v1.length == 0 or v2.length == 0:
         raise ValueError('Cannot get angle to zero vector.')
     angle_cos = v1.unit().dot_product(v2.unit())
+    # angle_cos = v1.dot_product(v2)
     if angle_cos == 0:
         result = math.pi / 2
-    elif abs(abs(angle_cos) - 1) < 0.001:
+    elif abs(abs(angle_cos) - 1) < 0.000001:
         result = 0
     else:
         result = math.acos(angle_cos)

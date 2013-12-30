@@ -13,6 +13,9 @@ from geometry.vector import Vector
 from geometry import geometryutils
 
 
+DEFAULT_JOBS = 4
+
+
 def parse_options():
     parser = ArgumentParser(description=u'Обчислення параметрів моделі.')
 
@@ -25,8 +28,11 @@ def parse_options():
                         type=float, nargs=3, required=True,
                         metavar=(u'x', u'y', u'z'),
                         help=u'Координати точки спостереження')
+    parser.add_argument('-j', '--jobs',
+                        type=int, help=u'Кількість потоків',
+                        default=DEFAULT_JOBS)
     parser.add_argument('-o', '--output_file', type=str,
-                        default='output.csv',
+                        default='output.csv', required=True,
                         help=u'Шлях до файла, куди буде збережно результат.')
 
     args = parser.parse_args()
@@ -54,8 +60,7 @@ def main():
     faces = importutils.get_faces(args.input_file)
     print 'Файл імпортовано.'
 
-    pool = Pool(4)
-
+    pool = Pool(args.jobs)
     try:
         result = pool.map_async(geometryutils.build_triangles, faces, 10000)
     except KeyboardInterrupt:
@@ -67,8 +72,18 @@ def main():
 
     print 'Трикутники згенеровано.'
 
-    processor.write_triangles_data(triangles, viewpoint, args.wavelength, args.output_file)
-    print 'Модель оброблено, дані збережено в %s.' % args.output_file
+    try:
+        process_data = ((t, viewpoint, args.wavelength) for t in triangles)
+        result = pool.map_async(processor.try_process_triangle, process_data)
+    except KeyboardInterrupt:
+        pool.terminate()
+        print 'Програму зупинено'
+        return
+    data = result.get()
+    data = filter(lambda x: x, data)
+    print 'Модель оброблено.'
+    processor.write_triangles_data(data, args.output_file)
+    print 'Дані збережено в %s' % args.output_file
 
 
 if __name__ == '__main__':
