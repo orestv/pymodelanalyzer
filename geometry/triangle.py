@@ -17,7 +17,10 @@ class RightTriangle(object):
                self.leg_2 == other.leg_2
 
     def __str__(self):
-        return 'Base: %s, legs: %s and %s' % (self.vertex, self.leg_1, self.leg_2)
+        c = self.vertex
+        a = self.vertex + self.leg_1
+        b = self.vertex + self.leg_2
+        return '(%s, %s, %s)' % (c, a, b)
 
     def __repr__(self):
-        return 'Base: %s, legs: %s and %s' % (self.vertex, self.leg_1, self.leg_2)
+        return str(self)

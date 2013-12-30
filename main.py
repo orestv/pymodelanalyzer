@@ -3,7 +3,6 @@
 __author__ = 'seth'
 
 from argparse import ArgumentParser
-import sys
 from multiprocessing import Pool
 from itertools import chain
 
@@ -39,51 +38,40 @@ def parse_options():
     return args
 
 
-def generate_notify_func(message):
-    progress_string = '\r%s %%d%%%% завершено.' % message
-
-    def notify_func(percentage):
-        sys.stdout.write(progress_string % percentage)
-        if percentage == 100:
-            sys.stdout.write('\n')
-        sys.stdout.flush()
-
-    return notify_func
-
-
 def main():
     args = parse_options()
     viewpoint = args.observation_point
     viewpoint = Vector(*viewpoint)
     vertex_count, face_count, lines_count = importutils.analyze_file(args.input_file)
-    print 'Кількість вершин: %d, кількість примітивів: %d' % (vertex_count, face_count)
+    print 'Vertices: %d, Primitives: %d' % (vertex_count, face_count)
     faces = importutils.get_faces(args.input_file)
-    print 'Файл імпортовано.'
+    print 'File imported.'
 
     pool = Pool(args.jobs)
     try:
-        result = pool.map_async(geometryutils.build_triangles, faces, 10000)
+        result = pool.map_async(geometryutils.build_triangles, faces[:10], 10000)
     except KeyboardInterrupt:
         pool.terminate()
-        print 'Програму зупинено'
+        print 'Program stopped.'
         return
     triangles = result.get()
+
     triangles = chain.from_iterable(triangles)
 
-    print 'Трикутники згенеровано.'
+    print 'Triangles generated.'
 
     try:
         process_data = ((t, viewpoint, args.wavelength) for t in triangles)
         result = pool.map_async(processor.try_process_triangle, process_data)
     except KeyboardInterrupt:
         pool.terminate()
-        print 'Програму зупинено'
+        print 'Program stopped.'
         return
     data = result.get()
     data = filter(lambda x: x, data)
-    print 'Модель оброблено.'
+    print 'Model processed.'
     processor.write_triangles_data(data, args.output_file)
-    print 'Дані збережено в %s' % args.output_file
+    print 'Data written into %s' % args.output_file
 
 
 if __name__ == '__main__':

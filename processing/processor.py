@@ -91,8 +91,8 @@ def try_process_triangle(args):
 
 
 def write_triangles_data(data, path):
-    string_output = ['%.8f,%.8f,%.8f,%.8f,%.8f%s' % (d['a'], d['b'], d['alpha'], d['beta'], d['f'], os.linesep)
+    string_output = ['%.8f;%.8f;%.8f;%.8f;%.8f%s' % (d['a'], d['b'], d['alpha'], d['beta'], d['f'], os.linesep)
                      for d in data]
-    with open(path, 'w') as output_file:
+    with open(path, 'wb') as output_file:
         output_file.writelines(string_output)
 
