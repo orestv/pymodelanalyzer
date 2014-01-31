@@ -1,10 +1,14 @@
 # coding=utf-8
+from PyQt4.QtCore import pyqtSignal
 
 from PyQt4.QtGui import QLabel, QWidget, QGridLayout
 from gui.filewidget import FileWidget
 
 
 class ParamsWidget(QWidget):
+
+    updated = pyqtSignal()
+
     def __init__(self):
         super(ParamsWidget, self).__init__()
 
@@ -34,9 +38,11 @@ class ParamsWidget(QWidget):
 
     def model_file_selected(self, model_path):
         self.model_path = model_path
+        self.updated.emit()
 
     def excel_file_selected(self, excel_path):
         self.excel_path = excel_path
+        self.updated.emit()
 
     def is_params_specified(self):
         return self.model_path is not None and \
