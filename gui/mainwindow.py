@@ -1,5 +1,6 @@
 # coding=utf-8
 from PyQt4 import QtGui
+from PyQt4.QtGui import QApplication
 from gui.paramswidget import ParamsWidget
 
 
@@ -10,11 +11,14 @@ class MainWindow(QtGui.QWidget):
         self.params = ParamsWidget()
         self.btn_run = QtGui.QPushButton(u"Запустити")
 
-        self.setGeometry(300, 300, 350, 450)
         self.setWindowTitle(u'Аналіз моделі')
 
         self.init_layout()
         self.init_events()
+
+        self.adjustSize()
+        self.move(QApplication.desktop().screen().rect().center()
+                  - self.rect().center())
 
         self.update_widgets_state()
 
