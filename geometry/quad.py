@@ -8,7 +8,7 @@ class Quad(object):
             v1 = self.vertices[0] - self.vertices[1]
             v2 = self.vertices[2] - self.vertices[1]
             normale = v2.vector_product(v1)
-        normale = normale.get_normalized()
+        normale = normale.unit()
         self.normale = normale
 
     def __eq__(self, other):

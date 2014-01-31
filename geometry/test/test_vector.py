@@ -24,13 +24,13 @@ class TestVector(unittest.TestCase):
 
     def test_get_normalized(self):
         v = Vector(1, 1, 1)
-        n = v.get_normalized()
+        n = v.unit()
         self.assertAlmostEqual(n.x, 0.577, 3)
         self.assertAlmostEqual(n.y, 0.577, 3)
         self.assertAlmostEqual(n.z, 0.577, 3)
 
         v = Vector(0, 0, 0)
-        self.assertRaises(ValueError, v.get_normalized)
+        self.assertRaises(ValueError, v.unit)
 
     def test_vector_product(self):
         v1 = Vector(1, 0, 0)

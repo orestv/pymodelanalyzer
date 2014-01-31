@@ -1,11 +1,17 @@
 __author__ = 'seth'
 
+# from bigfloat import BigFloat
+
 
 class Vector(object):
+    __slots__ = ('x', 'y', 'z', '_length', '_unit')
+
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+        self._length = None
+        self._unit = None
 
     def __lt__(self, other):
         return self.length < other.length
@@ -49,19 +55,27 @@ class Vector(object):
         return self.x, self.y, self.z
 
     @property
-    def length(self):
+    def __length(self):
         len_square = self.x * self.x + self.y * self.y + self.z * self.z
         return pow(len_square, 0.5)
+
+    @property
+    def length(self):
+        if not self._length:
+            self._length = (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
+        return self._length
 
     @property
     def is_normalized(self):
         return self.length == 1
 
-    def get_normalized(self):
+    def unit(self):
         if self.length == 0:
             raise ValueError("Cannot normalize zero vector.")
-        x, y, z = self.x / self.length, self.y / self.length, self.z / self.length
-        return Vector(x, y, z)
+        if not self._unit:
+            x, y, z = self.x / self.length, self.y / self.length, self.z / self.length
+            self._unit = Vector(x, y, z)
+        return self._unit
 
     def scalar_add(self, number):
         x, y, z = self.x + number, self.y + number, self.z + number

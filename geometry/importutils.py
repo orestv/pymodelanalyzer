@@ -1,27 +1,34 @@
 # -*- coding: utf-8 -*
 __author__ = 'seth'
 
+import logging
+import sys
+
 from vector import Vector
-from quad import Quad
+import geometryutils
+
+logger = logging.getLogger('ImportUtils')
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 def parse_vertex_line(line):
     coordinates = line.split()[1:]  # skip "v "
     if len(coordinates) != 3:
-        raise ValueError(u'Точка %s містить недостатньо координат!' % line)
-    x, y, z = coordinates
+        raise ValueError('Точка %s містить невірну кількість координат!' % line)
     try:
-        x, y, z = float(x), float(y), float(z)
+        coordinates = map(float, coordinates)
+    # try:
+    #     x, y, z = map(lambda s: BigFloat.exact(s, precision=50), (x, y, z))
     except ValueError:
-        raise ValueError(u'Невірний формат числа в рядку %s' % line)
-    return Vector(x, y, z)
+        raise ValueError('Невірний формат числа в рядку %s' % line)
+    return Vector(*coordinates)
 
 
 def parse_face_line(line):
     vertices = line.split()[1:]    # skip "f "
-    if len(vertices) != 4:
-        raise ValueError(u'Примітив %s - не чотирикутник!' % line)
     vertex_indices = []
+    if len(vertices) < 3:
+        raise ValueError('Рядок %s містить недостатньо вершин.' % line)
     for vertex_data in vertices:
         vertex_index = vertex_data.split('/')[0]
         vertex_index = int(vertex_index)-1  # indices in the file start with 1
@@ -29,23 +36,41 @@ def parse_face_line(line):
     return vertex_indices
 
 
-def import_obj(path):
+def get_faces(path):
     vertices = []
     faces = []
     with open(path, 'r') as objfile:
-        for line in objfile:
-            if line.startswith('v '):
-                vertices.append(parse_vertex_line(line))
-            elif line.startswith('f '):
-                faces.append(parse_face_line(line))
-    quads = build_quads(vertices, faces)
-    return quads
+        lines = objfile.readlines()
+    logger.debug('File read.')
+    for line in lines:
+        if line.startswith('v '):
+            vertices.append(parse_vertex_line(line))
+        elif line.startswith('f '):
+            faces.append(parse_face_line(line))
+    logger.debug('Face and vertex lists created.')
+    return [[vertices[i] for i in face] for face in faces]
 
 
-def build_quads(vertices, faces):
-    quads = []
+def build_triangles(faces, notify_func=None):
+    triangles = []
+    processed_faces = 0
     for face in faces:
-        quad_vertices = [vertices[i] for i in face]
-        quad = Quad(quad_vertices, normale=None)
-        quads.append(quad)
-    return quads
+        if notify_func:
+            processed_faces += 1
+            if processed_faces % 100 == 0:
+                percentage = float(processed_faces) / len(faces) * 100
+                notify_func(percentage)
+        triangles += geometryutils.build_triangles(face)
+    return triangles
+
+
+def analyze_file(path):
+    vertex_count, face_count, lines_count = 0, 0, 0
+    with open(path, 'r') as objfile:
+        for line in objfile:
+            lines_count += 1
+            if line.startswith('v '):
+                vertex_count += 1
+            elif line.startswith('f '):
+                face_count += 1
+    return vertex_count, face_count, lines_count
