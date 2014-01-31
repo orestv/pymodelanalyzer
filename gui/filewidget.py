@@ -42,10 +42,9 @@ class FileWidget(QWidget):
             path = QFileDialog.getSaveFileName(filter=self.files_filter)
         else:
             path = QFileDialog.getOpenFileName(filter=self.files_filter)
+
         if path:
             path = str(path)
             filename = os.path.basename(path)
             self.label_filename.setText(filename)
             self.selected.emit(path)
-        else:
-            self.label_filename.setText('N/A')
