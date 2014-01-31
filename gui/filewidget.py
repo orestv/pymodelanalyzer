@@ -19,7 +19,7 @@ class FileWidget(QWidget):
         self.save = save
         self.path = None
 
-        self.label_filename = QLabel('N/A')
+        self.label_filename = QLabel(u'N/A')
         self.button_select = QPushButton(u'Відкрити...')
 
         self.init_layout()

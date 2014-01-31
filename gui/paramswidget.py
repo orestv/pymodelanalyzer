@@ -1,7 +1,7 @@
 # coding=utf-8
-from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import pyqtSignal, QLocale
 
-from PyQt4.QtGui import QLabel, QWidget, QGridLayout
+from PyQt4.QtGui import QLabel, QWidget, QGridLayout, QLineEdit, QDoubleValidator, QIntValidator
 from gui.filewidget import FileWidget
 
 
@@ -17,9 +17,18 @@ class ParamsWidget(QWidget):
 
         self.model_file_picker = FileWidget(None, False)
         self.excel_file_picker = FileWidget('*.xlsx', True)
+        self.edit_light_speed = QLineEdit()
+        self.edit_frequency = QLineEdit()
 
         self.init_layout()
+        self.init_widgets()
         self.init_events()
+
+    def init_widgets(self):
+        self.edit_light_speed.setText('299792458')
+        self.edit_light_speed.setEnabled(False)
+
+        self.edit_frequency.setText('95')
 
     def init_layout(self):
         table_layout = QGridLayout()
@@ -29,6 +38,12 @@ class ParamsWidget(QWidget):
 
         table_layout.addWidget(QLabel(u'Файл результату'), 1, 0)
         table_layout.addWidget(self.excel_file_picker, 1, 1)
+
+        table_layout.addWidget(QLabel(u'Швидкість світла, м/с'), 2, 0)
+        table_layout.addWidget(self.edit_light_speed, 2, 1)
+
+        table_layout.addWidget(QLabel(u'Частота скануючого сигналу, ГГц'), 3, 0)
+        table_layout.addWidget(self.edit_frequency, 3, 1)
 
         self.setLayout(table_layout)
 
