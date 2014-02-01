@@ -159,7 +159,7 @@ def calculate_En(triangle, light_speed, scan_frequency,
     elif abs(alpha) < EPS:
         e_n = sigma * math.cos(beta) ** 2 * \
               (((math.sin(k * b * math.sin(beta))) / (k * b * math.sin(beta))) ** 4 +
-               ((1 - math.sin(2 * k * b * math.sin(beta) / (2 * k * math.sin(beta))))
+               ((1 - math.sin(2 * k * b * math.sin(beta) / (2 * k * b * math.sin(beta))))
                 / (k * b * math.sin(beta))) ** 2)
     else:
         e_n = ((sigma * (math.cos(alpha) * math.cos(beta)) ** 2) /
