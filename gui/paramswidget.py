@@ -1,7 +1,7 @@
 # coding=utf-8
-from PyQt4.QtCore import pyqtSignal, QLocale
+from PyQt4.QtCore import pyqtSignal
 
-from PyQt4.QtGui import QLabel, QWidget, QGridLayout, QLineEdit, QDoubleValidator, QIntValidator
+from PyQt4.QtGui import QLabel, QWidget, QGridLayout, QLineEdit
 from gui.filewidget import FileWidget
 
 
@@ -15,10 +15,13 @@ class ParamsWidget(QWidget):
         self.model_path = None
         self.excel_path = None
 
-        self.model_file_picker = FileWidget(None, False)
+        self.model_file_picker = FileWidget('*.obj', False)
         self.excel_file_picker = FileWidget('*.xlsx', True)
         self.edit_light_speed = QLineEdit()
         self.edit_frequency = QLineEdit()
+        self.edit_wavelength = QLineEdit()
+        self.edit_observation_point_distance = QLineEdit()
+        self.edit_observation_rotation_step = QLineEdit()
 
         self.init_layout()
         self.init_widgets()
@@ -29,6 +32,10 @@ class ParamsWidget(QWidget):
         self.edit_light_speed.setEnabled(False)
 
         self.edit_frequency.setText('95')
+
+        self.edit_wavelength.setText('0,1')
+
+        self.edit_observation_point_distance.setText('20')
 
     def init_layout(self):
         table_layout = QGridLayout()
@@ -44,6 +51,15 @@ class ParamsWidget(QWidget):
 
         table_layout.addWidget(QLabel(u'Частота скануючого сигналу, ГГц'), 3, 0)
         table_layout.addWidget(self.edit_frequency, 3, 1)
+
+        table_layout.addWidget(QLabel(u'Довжина хвилі, м'), 4, 0)
+        table_layout.addWidget(self.edit_wavelength, 4, 1)
+
+        table_layout.addWidget(QLabel(u'Відстань від ТС до об\'єкта, м'), 5, 0)
+        table_layout.addWidget(self.edit_observation_point_distance, 5, 1)
+
+        table_layout.addWidget(QLabel(u'Крок повороту ТС, рад'), 6, 0)
+        table_layout.addWidget(self.edit_observation_rotation_step, 6, 1)
 
         self.setLayout(table_layout)
 

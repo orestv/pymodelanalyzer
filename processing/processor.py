@@ -6,7 +6,7 @@ import logging
 
 from geometry import geometryutils
 
-VECTOR_EQUALITY_EPS = 0.001
+EPS = 0.001
 
 logger = logging.getLogger('processor')
 logger.addHandler(logging.FileHandler('processor.log'))
@@ -53,7 +53,7 @@ def process_triangle(viewpoint, wavelength, triangle):
     angles_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
 
     angles = {}
-    if abs(triangle.leg_1.length - triangle.leg_2.length) < VECTOR_EQUALITY_EPS:
+    if abs(triangle.leg_1.length - triangle.leg_2.length) < EPS:
         angles['alpha'] = min(angles_1['alpha'], angles_2['alpha'])
         angles['beta'] = min(angles_1['beta'], angles_2['beta'])
     elif triangle.leg_1 < triangle.leg_2:
@@ -80,6 +80,28 @@ def process_triangle(viewpoint, wavelength, triangle):
     return result
 
 
+def get_triangle_properties(triangle, viewpoint):
+    view_vector = triangle.vertex - viewpoint
+    angles_1 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_2)
+    angles_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
+
+    properties = {}
+    if abs(triangle.leg_1.length - triangle.leg_2.length) < EPS:
+        properties['alpha'] = min(angles_1['alpha'], angles_2['alpha'])
+        properties['beta'] = min(angles_1['beta'], angles_2['beta'])
+    elif triangle.leg_1 < triangle.leg_2:
+        properties = angles_1
+    else:
+        properties = angles_2
+
+    a = min(triangle.leg_1.length, triangle.leg_2.length)
+    b = max(triangle.leg_1.length, triangle.leg_2.length)
+
+    properties['a'] = a
+    properties['b'] = b
+    return properties
+
+
 def try_process_triangle(args):
     triangle, viewpoint, wavelength = args
     data = None
@@ -96,3 +118,59 @@ def write_triangles_data(data, path):
     with open(path, 'wb') as output_file:
         output_file.writelines(string_output)
 
+
+def frange(a, b, step):
+    if a >= b:
+        raise ValueError('a cannot be smaller than b.')
+    x = a
+    while x < b:
+        yield x
+        x += step
+
+
+def calculate_E(triangles, light_speed, scan_frequency,
+                wavelength, viewpoint):
+    k = 2 * math.pi * scan_frequency / light_speed
+    sum_cos = 0
+    sum_sin = 0
+    for t in triangles:
+        e_n = calculate_En(t, light_speed, scan_frequency,
+                           wavelength, viewpoint)
+        r_n = viewpoint.dist(t.vertex)
+        sum_cos += e_n * math.cos(k * r_n)
+        sum_sin += e_n * math.sin(k * r_n)
+    return pow(sum_cos ** 2 + sum_sin ** 2, 0.5)
+
+
+def calculate_En(triangle, light_speed, scan_frequency,
+                 wavelength, viewpoint):
+    k = 2 * math.pi * scan_frequency / light_speed
+    triangle_properties = get_triangle_properties(triangle, viewpoint)
+    alpha, beta, a, b = (triangle_properties[x] for x in ['alpha', 'beta', 'a', 'b'])
+
+    sigma = 4 * math.pi * (alpha ** 2) * (beta ** 2) / (wavelength ** 2)
+
+    if abs(alpha) < EPS and abs(beta) < EPS:
+        e_n = sigma
+    elif abs(beta) < EPS:
+        e_n = sigma * math.cos(alpha) ** 2 * \
+              (math.sin(k * alpha * math.cos(alpha)) /
+               k * alpha * math.sin(alpha)) ** 4
+    elif abs(alpha) < EPS:
+        e_n = sigma * math.cos(beta) ** 2 * \
+              (((math.sin(k * b * math.sin(beta))) / (k * b * math.sin(beta))) ** 4 +
+               ((1 - math.sin(2 * k * b * math.sin(beta) / (2 * k * math.sin(beta))))
+                / (k * b * math.sin(beta))) ** 2)
+    else:
+        e_n = ((sigma * (math.cos(alpha) * math.cos(beta)) ** 2) /
+               ((k * a * math.sin(alpha) * math.cos(beta)) ** 2 -
+                (k * b * math.sin(beta)) ** 2) ** 2) * \
+              (math.sin(k * a * math.sin(alpha) * math.cos(beta)) ** 2 -
+               (math.sin(k * b * math.sin(beta)) ** 2 +
+                (k * b * math.sin(beta)) ** 2) * (
+                   ((math.sin(2 * k * a * math.sin(alpha) * math.cos(beta))) /
+                    (2 * k * a * math.sin(alpha) * math.cos(beta)) -
+                    (math.sin(2 * k * b * math.sin(beta))) /
+                    (2 * k * b * math.sin(beta))) ** 2
+               ))
+    return e_n

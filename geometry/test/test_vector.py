@@ -62,6 +62,14 @@ class TestVector(unittest.TestCase):
         v = v1 + v2
         self.assertEquals(v, Vector(0, 2, 0))
 
+    def test_distance(self):
+        v1 = Vector(1, 1, 0)
+        v2 = Vector(2, 2, 0)
+
+        self.assertAlmostEqual(v1.dist(v2), v2.dist(v1))
+
+        self.assertAlmostEqual(v1.dist(v2), pow(2, 0.5))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -76,6 +76,11 @@ class TestProcessor(unittest.TestCase):
                                       'beta': 0.5,
                                       'f': 10})
 
+    def test_frange(self):
+        i = processor.frange(0, 1, 0.1)
+        l = list(i)
+        self.assertEquals(l, [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+
 
 if __name__ == '__main__':
     unittest.main()

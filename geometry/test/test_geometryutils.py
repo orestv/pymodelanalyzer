@@ -165,6 +165,3 @@ class TestUtils(TestCase):
                     Vector(0, 2, 0)]
         v = geometryutils.find_right_triangle_vertex(vertices)
         self.assertEquals(v, Vector(0, 0, 0))
-
-    def test_build_triangles(self):
-        self.fail('Not implemented yet')

@@ -65,6 +65,12 @@ class Vector(object):
             self._length = (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
         return self._length
 
+    def dist(self, other):
+        s = 0
+        for a, b in zip(self.coordinates, other.coordinates):
+            s += (a - b) ** 2
+        return pow(s, 0.5)
+
     @property
     def is_normalized(self):
         return self.length == 1
