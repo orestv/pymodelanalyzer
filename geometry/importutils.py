@@ -36,7 +36,7 @@ def parse_face_line(line):
     return vertex_indices
 
 
-def get_faces(path, update=None, cancelled=None):
+def get_faces(path, update_percentage=None, check_cancelled=None):
     vertices = []
     faces = []
     with open(path, 'r') as objfile:
@@ -45,34 +45,38 @@ def get_faces(path, update=None, cancelled=None):
     line_number = 0
     last_percentage = 0
     for line in lines:
-        if update:
+        if update_percentage:
             percentage = int(100 * float(line_number) / len(lines))
             if percentage != last_percentage:
-                update(percentage)
+                update_percentage(percentage)
                 last_percentage = percentage
-                if cancelled and cancelled():
-                    logger.debug('Import cancelled')
-                    raise Exception('Import interrupted')
+                if check_cancelled:
+                    check_cancelled()
         line_number += 1
         if line.startswith('v '):
             vertices.append(parse_vertex_line(line))
         elif line.startswith('f '):
             faces.append(parse_face_line(line))
-    if update:
-        update(100)
+    if update_percentage:
+        update_percentage(100)
     logger.debug('Face and vertex lists created.')
     return [[vertices[i] for i in face] for face in faces]
 
 
-def build_triangles(faces, notify_func=None):
+def build_triangles(faces, update_percentage=None, check_cancelled=None):
     triangles = []
     processed_faces = 0
+    previous_percentage = None
     for face in faces:
-        if notify_func:
+        if check_cancelled:
+            check_cancelled()
+        if update_percentage:
             processed_faces += 1
             if processed_faces % 100 == 0:
-                percentage = float(processed_faces) / len(faces) * 100
-                notify_func(percentage)
+                percentage = int(float(processed_faces) / len(faces) * 100)
+                if previous_percentage != percentage:
+                    update_percentage(percentage)
+                    previous_percentage = percentage
         triangles += geometryutils.build_triangles(face)
     return triangles
 
