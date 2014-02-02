@@ -62,17 +62,18 @@ class MainWindow(QtGui.QWidget):
         self.progress_dialog.setValue(0)
 
         self.calc = Calculator(target=target, args=args,
-                               clean_up_handler=self.clean_up,
-                          result_handler=result_handler)
+                               clean_up_handler=self.calc_finished,
+                               result_handler=result_handler)
         self.calc.updated.connect(self.progress_dialog.setValue)
         self.calc.eta_updated.connect(self.update_eta_label)
+        self.calc.finished.connect(self.calc_finished)
         self.progress_dialog.canceled.connect(self.calc.cancel)
         self.calc.start()
 
-    def clean_up(self, calculator):
-        pass
-        # self.progress_dialog.canceled.disconnect(calculator.cancel)
-        # calculator.updated.disconnect(self.progress_dialog.setValue)
+    @pyqtSlot()
+    def calc_finished(self):
+        self.progress_dialog.setAutoClose(True)
+        self.progress_dialog.setValue(100)
 
     def process(self, update_percentage=None, check_cancelled=None):
         params = self.params.get_params()

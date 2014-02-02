@@ -11,6 +11,7 @@ class InterruptException(Exception):
 class Calculator(QObject):
     updated = pyqtSignal(float)
     eta_updated = pyqtSignal(float)
+    finished = pyqtSignal()
 
     def __init__(self, target=None, args=None, clean_up_handler=None,
                  result_handler=None):
@@ -45,11 +46,11 @@ class Calculator(QObject):
     def update(self, percentage):
         self.updated.emit(self.percentage)
         self.percentage = percentage
-        if percentage > 5:
+        if percentage > 0:
             self.calculate_time_per_percent(percentage)
         if self.time_per_percent:
             time_left = self.time_per_percent * (100 - percentage)
-            self.eta_updated.emit(time_left)
+            self.eta_updated.emit(time_left + 1)
         else:
             self.eta_updated.emit(0)
 
@@ -60,8 +61,7 @@ class Calculator(QObject):
         t.start()
 
     def clean_up(self):
-        if self.clean_up_handler:
-            self.clean_up_handler(self)
+        self.finished.emit()
         self.time_per_percent = None
         if self.running:
             self.update(100)
