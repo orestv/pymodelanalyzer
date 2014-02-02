@@ -80,20 +80,15 @@ class MainWindow(QtGui.QWidget):
         params = self.params.get_params()
         model_path = params['model_path']
 
-        self.progress_dialog_base_title = u'Імпорт файла... '
-        self.label_text_update_require.emit('')
+        self.prepare_progressdialog(u'Імпорт файла... ')
         faces = importutils.get_faces(model_path, update_percentage,
                                       check_cancelled)
         print 'Faces imported'
-        self.progress_dialog_base_title = u'Перетворення трикутників... '
-        self.label_text_update_require.emit('')
-        self.calc.mark_process_time()
+        self.prepare_progressdialog(u'Перетворення трикутників... ')
         triangles = importutils.build_triangles(faces, update_percentage,
                                                 check_cancelled)
 
-        self.progress_dialog_base_title = u'Корекція моделі... '
-        self.label_text_update_require.emit('')
-        self.calc.mark_process_time()
+        self.prepare_progressdialog(u'Корекція моделі... ')
         clean_triangles = importutils.discard_invalid_triangles(triangles,
                                                                 vector.Vector(20, 2, 20),
                                                                 update_percentage,
@@ -103,12 +98,15 @@ class MainWindow(QtGui.QWidget):
 
         triangles = clean_triangles
 
-        self.progress_dialog_base_title = u'Обчислення E... '
-        self.label_text_update_require.emit('')
-        self.calc.mark_process_time()
+        self.prepare_progressdialog(u'Обчислення E... ')
         E, sum_cos, sum_sin = processor.calculate_viewpoint_sums(triangles, params['wavelength'],
                                                                  vector.Vector(20, 2, 20),
                                                                  update_percentage, check_cancelled)
+
+    def prepare_progressdialog(self, label):
+        self.progress_dialog_base_title = label
+        self.label_text_update_require.emit('')
+        self.calc.mark_process_time()
 
     @pyqtSlot(str)
     def update_progressdialog_label(self, label):
