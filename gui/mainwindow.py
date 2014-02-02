@@ -5,9 +5,10 @@ import time
 from PyQt4.QtCore import Qt, pyqtSlot, pyqtSignal
 from PyQt4.QtGui import QApplication, QProgressDialog
 
-from geometry import importutils
+from geometry import importutils, vector
 from gui.calculator import Calculator
 from gui.paramswidget import ParamsWidget
+from processing import processor
 
 
 class MainWindow(QtGui.QWidget):
@@ -89,6 +90,25 @@ class MainWindow(QtGui.QWidget):
         self.calc.mark_process_time()
         triangles = importutils.build_triangles(faces, update_percentage,
                                                 check_cancelled)
+
+        self.progress_dialog_base_title = u'Корекція моделі... '
+        self.label_text_update_require.emit('')
+        self.calc.mark_process_time()
+        clean_triangles = importutils.discard_invalid_triangles(triangles,
+                                                                vector.Vector(20, 2, 20),
+                                                                update_percentage,
+                                                                check_cancelled)
+        print 'Triangles: %d, clean triangles: %d, diff: %d' % (
+            len(triangles), len(clean_triangles), len(triangles) - len(clean_triangles))
+
+        triangles = clean_triangles
+
+        self.progress_dialog_base_title = u'Обчислення E... '
+        self.label_text_update_require.emit('')
+        self.calc.mark_process_time()
+        E, sum_cos, sum_sin = processor.calculate_viewpoint_sums(triangles, params['wavelength'],
+                                                                 vector.Vector(20, 2, 20),
+                                                                 update_percentage, check_cancelled)
 
     @pyqtSlot(str)
     def update_progressdialog_label(self, label):

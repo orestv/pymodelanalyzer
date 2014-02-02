@@ -128,15 +128,27 @@ def frange(a, b, step):
         x += step
 
 
-def calculate_viewpoint_sums(triangles, wavelength, viewpoint):
+def calculate_viewpoint_sums(triangles, wavelength, viewpoint,
+                             update_percentage=None,
+                             check_cancelled=None):
     k = 2 * math.pi / wavelength
     sum_cos = 0
     sum_sin = 0
+    processed_triangles = 0
+    last_percentage = -1
     for t in triangles:
         e_n = calculate_En(t, wavelength, k, viewpoint)
         r_n = viewpoint.dist(t.vertex)
         sum_cos += e_n * math.cos(k * r_n)
         sum_sin += e_n * math.sin(k * r_n)
+
+        if update_percentage:
+            processed_triangles += 1
+            percentage = int(100 * float(processed_triangles) / len(triangles))
+            if percentage != last_percentage or True:
+                update_percentage(percentage)
+                last_percentage = percentage
+                check_cancelled()
     return pow(sum_cos ** 2 + sum_sin ** 2, 0.5), sum_cos, sum_sin
 
 

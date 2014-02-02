@@ -9,6 +9,8 @@ class RightTriangle(object):
     @property
     def normale(self):
         product = self.leg_1.vector_product(self.leg_2)
+        if product.length == 0:
+            print 'Vector product of %s and %s equals to 0: ' % (self.leg_1, self.leg_2)
         return product.unit()
 
     def __eq__(self, other):

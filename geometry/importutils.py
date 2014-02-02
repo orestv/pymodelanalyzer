@@ -81,6 +81,27 @@ def build_triangles(faces, update_percentage=None, check_cancelled=None):
     return triangles
 
 
+def discard_invalid_triangles(triangles, viewpoint, update_percentage=None, check_cancelled=None):
+    result = []
+    p, previous_percentage = 0, 0
+    for t in triangles:
+        if check_cancelled:
+            check_cancelled()
+        if update_percentage:
+            p += 1
+            if p % 10000 == 0:
+                percentage = int(100 * float(p) / len(triangles))
+                if percentage != previous_percentage:
+                    update_percentage(percentage)
+                    previous_percentage = percentage
+        if t.leg_1.length < 0.01 or t.leg_2.length < 0.01:
+            continue
+        if not geometryutils.is_triangle_visible(t, viewpoint):
+            continue
+        result.append(t)
+    return result
+
+
 def analyze_file(path):
     vertex_count, face_count, lines_count = 0, 0, 0
     with open(path, 'r') as objfile:

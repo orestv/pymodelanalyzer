@@ -95,14 +95,16 @@ class ParamsWidget(QWidget):
     def get_params(self):
         frequency = self.edit_frequency.text()
         frequency = float(frequency) * 10 ** 9
+        wavelength = LIGHT_SPEED / frequency
         return {'model_path': self.model_path,
                 'excel_path': self.excel_path,
-                'frequency': frequency}
+                'frequency': frequency,
+                'wavelength': wavelength}
 
     @pyqtSlot(str)
     def update_wavelength(self, frequency):
         if not frequency:
-            self.edit_wavelength = str()
+            self.edit_wavelength.setText(str())
             return
         frequency = float(frequency) * 10 ** 9
         wavelength = LIGHT_SPEED / frequency
