@@ -17,7 +17,7 @@ def get_triangle_leg_angles(triangle_normale, view_vector, plane_normale):
     alpha = geometryutils.sharp_angle(view_vector_projection, triangle_normale)
     beta = geometryutils.sharp_angle(view_vector, view_vector_projection)
 
-    return {'alpha': alpha, 'beta': beta}
+    return alpha, beta
 
 
 def get_f(alpha, beta, a, b, wavelength):
@@ -49,25 +49,25 @@ def process_triangle(viewpoint, wavelength, triangle):
     # we need to project stuff onto the smaller leg's plane;
     # use the longer leg as the plane's normale
 
-    angles_1 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_2)
-    angles_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
+    alpha_1, beta_1 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_2)
+    alpha_2, beta_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
 
     angles = {}
     if abs(triangle.leg_1.length - triangle.leg_2.length) < EPS:
-        angles['alpha'] = min(angles_1['alpha'], angles_2['alpha'])
-        angles['beta'] = min(angles_1['beta'], angles_2['beta'])
+        alpha = min(alpha_1, alpha_2)
+        beta = min(beta_1, beta_2)
     elif triangle.leg_1 < triangle.leg_2:
-        angles = angles_1
+        alpha, beta = alpha_1, beta_1
     else:
-        angles = angles_2
+        alpha, beta = alpha_2, beta_2
 
-    if angles['alpha'] == 0 or angles['beta'] == 0:
+    if alpha == 0 or beta == 0:
         raise ValueError('Triangle %s is perpendicular to view vector.' % triangle)
 
     a = min(triangle.leg_1.length, triangle.leg_2.length)
     b = max(triangle.leg_1.length, triangle.leg_2.length)
 
-    f = get_f(angles['alpha'], angles['beta'], a, b, wavelength)
+    f = get_f(alpha, beta, a, b, wavelength)
 
     result = {
         'a': a,
@@ -82,24 +82,27 @@ def process_triangle(viewpoint, wavelength, triangle):
 
 def get_triangle_properties(triangle, viewpoint):
     view_vector = triangle.vertex - viewpoint
-    angles_1 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_2)
-    angles_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
+    alpha_1, beta_1 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_2)
+    alpha_2, beta_2 = get_triangle_leg_angles(triangle.normale, view_vector, triangle.leg_1)
 
-    properties = {}
     if abs(triangle.leg_1.length - triangle.leg_2.length) < EPS:
-        properties['alpha'] = min(angles_1['alpha'], angles_2['alpha'])
-        properties['beta'] = min(angles_1['beta'], angles_2['beta'])
+        alpha = min(alpha_1, alpha_2)
+        beta = min(beta_1, beta_2)
     elif triangle.leg_1 < triangle.leg_2:
-        properties = angles_1
+        alpha, beta = alpha_1, beta_1
     else:
-        properties = angles_2
+        alpha, beta = alpha_2, beta_2
+
+    if alpha == 0 or beta == 0:
+        print triangle.normale, view_vector, view_vector.unit()
+        print alpha_1, beta_1, alpha_2, beta_2
+        print triangle.leg_1, triangle.leg_1.unit(), triangle.leg_2, triangle.leg_2.unit()
+        raise ValueError('Triangle %s is perpendicular to view vector.' % triangle)
 
     a = min(triangle.leg_1.length, triangle.leg_2.length)
     b = max(triangle.leg_1.length, triangle.leg_2.length)
 
-    properties['a'] = a
-    properties['b'] = b
-    return properties
+    return alpha, beta, a, b
 
 
 def try_process_triangle(args):
@@ -136,6 +139,8 @@ def calculate_viewpoint_sums(triangles, wavelength, viewpoint,
     sum_sin = 0
     processed_triangles = 0
     last_percentage = -1
+    if update_percentage:
+        update_percentage(0)
     for t in triangles:
         e_n = calculate_En(t, wavelength, k, viewpoint)
         r_n = viewpoint.dist(t.vertex)
@@ -153,32 +158,34 @@ def calculate_viewpoint_sums(triangles, wavelength, viewpoint,
 
 
 def calculate_En(triangle, wavelength, k, viewpoint):
-    triangle_properties = get_triangle_properties(triangle, viewpoint)
-    alpha, beta, a, b = (triangle_properties[x] for x in ['alpha', 'beta', 'a', 'b'])
+    alpha, beta, a, b = get_triangle_properties(triangle, viewpoint)
+
+    sina, cosa, sinb, cosb = math.sin(alpha), math.cos(alpha), \
+                             math.sin(beta), math.cos(beta)
 
     sigma = 4 * math.pi * (alpha ** 2) * (beta ** 2) / (wavelength ** 2)
 
     if abs(alpha) < EPS and abs(beta) < EPS:
         e_n = sigma
     elif abs(beta) < EPS:
-        e_n = sigma * math.cos(alpha) ** 2 * \
-              (math.sin(k * alpha * math.cos(alpha)) /
-               k * alpha * math.sin(alpha)) ** 4
+        e_n = sigma * cosa ** 2 * \
+              (math.sin(k * alpha * cosa) /
+               k * alpha * sina) ** 4
     elif abs(alpha) < EPS:
-        e_n = sigma * math.cos(beta) ** 2 * \
-              (((math.sin(k * b * math.sin(beta))) / (k * b * math.sin(beta))) ** 4 +
-               ((1 - math.sin(2 * k * b * math.sin(beta) / (2 * k * b * math.sin(beta))))
-                / (k * b * math.sin(beta))) ** 2)
+        e_n = sigma * cosb ** 2 * \
+              (((math.sin(k * b * sinb)) / (k * b * sinb)) ** 4 +
+               ((1 - math.sin(2 * k * b * sinb / (2 * k * b * sinb)))
+                / (k * b * sinb)) ** 2)
     else:
-        e_n = ((sigma * (math.cos(alpha) * math.cos(beta)) ** 2) /
-               ((k * a * math.sin(alpha) * math.cos(beta)) ** 2 -
-                (k * b * math.sin(beta)) ** 2) ** 2) * \
-              (math.sin(k * a * math.sin(alpha) * math.cos(beta)) ** 2 -
-               (math.sin(k * b * math.sin(beta)) ** 2 +
-                (k * b * math.sin(beta)) ** 2) * (
-                   ((math.sin(2 * k * a * math.sin(alpha) * math.cos(beta))) /
-                    (2 * k * a * math.sin(alpha) * math.cos(beta)) -
-                    (math.sin(2 * k * b * math.sin(beta))) /
-                    (2 * k * b * math.sin(beta))) ** 2
+        e_n = ((sigma * (cosa * cosb) ** 2) /
+               ((k * a * sina * cosb) ** 2 -
+                (k * b * sinb) ** 2) ** 2) * \
+              (math.sin(k * a * sina * cosb) ** 2 -
+               (math.sin(k * b * sinb) ** 2 +
+                (k * b * sinb) ** 2) * (
+                   ((math.sin(2 * k * a * sina * cosb)) /
+                    (2 * k * a * sina * cosb) -
+                    (math.sin(2 * k * b * sinb)) /
+                    (2 * k * b * sinb)) ** 2
                ))
     return e_n

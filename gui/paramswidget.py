@@ -18,7 +18,7 @@ class ParamsWidget(QWidget):
         self.model_path = None
         self.excel_path = None
 
-        self.model_file_picker = FileWidget('*.obj', False)
+        self.model_file_picker = FileWidget(u'Моделі (*.obj *.obj.pickle)', False)
         self.excel_file_picker = FileWidget('*.xlsx', True)
         self.edit_light_speed = QLineEdit()
         self.edit_frequency = QLineEdit()
@@ -31,7 +31,7 @@ class ParamsWidget(QWidget):
         self.init_widgets()
         self.init_events()
 
-        self.model_file_picker.set_path('models/t72.obj')
+        self.model_file_picker.set_path('models/t72.obj.pickle')
         self.excel_file_picker.set_path('output.xlsx')
 
     def init_widgets(self):

@@ -1,5 +1,7 @@
 # coding=utf-8
 from PyQt4 import QtGui
+import os
+import pickle
 import time
 
 from PyQt4.QtCore import Qt, pyqtSlot, pyqtSignal
@@ -78,23 +80,37 @@ class MainWindow(QtGui.QWidget):
 
     def process(self, update_percentage=None, check_cancelled=None):
         params = self.params.get_params()
-        model_path = params['model_path']
+        model_path = str(params['model_path'])
 
-        self.prepare_progressdialog(u'Імпорт файла... ')
-        faces = importutils.get_faces(model_path, update_percentage,
-                                      check_cancelled)
-        print 'Faces imported'
-        self.prepare_progressdialog(u'Перетворення трикутників... ')
-        triangles = importutils.build_triangles(faces, update_percentage,
-                                                check_cancelled)
+        filename, extension = os.path.splitext(model_path)
+        if extension == '.obj':
+            self.prepare_progressdialog(u'Імпорт файла... ')
+            faces = importutils.get_faces(model_path, update_percentage,
+                                          check_cancelled)
+            print 'Faces imported'
+            self.prepare_progressdialog(u'Перетворення трикутників... ')
+            triangles = importutils.build_triangles(faces, update_percentage,
+                                                    check_cancelled)
 
-        self.prepare_progressdialog(u'Корекція моделі... ')
-        clean_triangles = importutils.discard_invalid_triangles(triangles,
-                                                                vector.Vector(20, 2, 20),
-                                                                update_percentage,
-                                                                check_cancelled)
-        print 'Triangles: %d, clean triangles: %d, diff: %d' % (
-            len(triangles), len(clean_triangles), len(triangles) - len(clean_triangles))
+            self.prepare_progressdialog(u'Корекція моделі... ')
+            clean_triangles = importutils.discard_invalid_triangles(triangles,
+                                                                    vector.Vector(20, 2, 20),
+                                                                    update_percentage,
+                                                                    check_cancelled)
+            print 'Triangles: %d, clean triangles: %d, diff: %d' % (
+                len(triangles), len(clean_triangles), len(triangles) - len(clean_triangles))
+            pickle_path = model_path + '.pickle'
+            with open(pickle_path, 'wb') as pickle_file:
+                try:
+                    pickle.dump(clean_triangles, pickle_file, -1)
+                    print 'Pickle saved to %s' % pickle_path
+                except Exception as e:
+                    print 'Failed to save clean triangles list: %s' % e
+        elif extension == '.pickle':
+            with open(model_path) as pickle_file:
+                clean_triangles = pickle.load(pickle_file)
+        else:
+            raise Exception('Invalid extension %s' % extension)
 
         triangles = clean_triangles
 

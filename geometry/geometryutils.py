@@ -147,5 +147,5 @@ def is_triangle_visible(triangle, viewpoint):
 
 
 def get_visible_triangles(triangles, viewpoint):
-    result = filter(lambda x: is_triangle_visible(x, viewpoint), triangles)
+    result = [x for x in triangles if is_triangle_visible(x, viewpoint)]
     return result

@@ -39,6 +39,8 @@ def parse_face_line(line):
 def get_faces(path, update_percentage=None, check_cancelled=None):
     vertices = []
     faces = []
+    if update_percentage:
+        update_percentage(0)
     with open(path, 'r') as objfile:
         lines = objfile.readlines()
     logger.debug('File read.')
@@ -67,6 +69,8 @@ def build_triangles(faces, update_percentage=None, check_cancelled=None):
     triangles = []
     processed_faces = 0
     previous_percentage = None
+    if update_percentage:
+        update_percentage(0)
     for face in faces:
         if check_cancelled:
             check_cancelled()
@@ -84,6 +88,8 @@ def build_triangles(faces, update_percentage=None, check_cancelled=None):
 def discard_invalid_triangles(triangles, viewpoint, update_percentage=None, check_cancelled=None):
     result = []
     p, previous_percentage = 0, 0
+    if update_percentage:
+        update_percentage(0)
     for t in triangles:
         if check_cancelled:
             check_cancelled()
@@ -95,8 +101,6 @@ def discard_invalid_triangles(triangles, viewpoint, update_percentage=None, chec
                     update_percentage(percentage)
                     previous_percentage = percentage
         if t.leg_1.length < 0.01 or t.leg_2.length < 0.01:
-            continue
-        if not geometryutils.is_triangle_visible(t, viewpoint):
             continue
         result.append(t)
     return result
