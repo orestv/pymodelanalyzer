@@ -128,23 +128,19 @@ def frange(a, b, step):
         x += step
 
 
-def calculate_E(triangles, light_speed, scan_frequency,
-                wavelength, viewpoint):
-    k = 2 * math.pi * scan_frequency / light_speed
+def calculate_viewpoint_sums(triangles, wavelength, viewpoint):
+    k = 2 * math.pi / wavelength
     sum_cos = 0
     sum_sin = 0
     for t in triangles:
-        e_n = calculate_En(t, light_speed, scan_frequency,
-                           wavelength, viewpoint)
+        e_n = calculate_En(t, wavelength, k, viewpoint)
         r_n = viewpoint.dist(t.vertex)
         sum_cos += e_n * math.cos(k * r_n)
         sum_sin += e_n * math.sin(k * r_n)
-    return pow(sum_cos ** 2 + sum_sin ** 2, 0.5)
+    return pow(sum_cos ** 2 + sum_sin ** 2, 0.5), sum_cos, sum_sin
 
 
-def calculate_En(triangle, light_speed, scan_frequency,
-                 wavelength, viewpoint):
-    k = 2 * math.pi * scan_frequency / light_speed
+def calculate_En(triangle, wavelength, k, viewpoint):
     triangle_properties = get_triangle_properties(triangle, viewpoint)
     alpha, beta, a, b = (triangle_properties[x] for x in ['alpha', 'beta', 'a', 'b'])
 

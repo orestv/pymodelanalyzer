@@ -1,8 +1,11 @@
 # coding=utf-8
-from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import pyqtSignal, pyqtSlot
 
 from PyQt4.QtGui import QLabel, QWidget, QGridLayout, QLineEdit
 from gui.filewidget import FileWidget
+
+
+LIGHT_SPEED = 299792458
 
 
 class ParamsWidget(QWidget):
@@ -21,11 +24,15 @@ class ParamsWidget(QWidget):
         self.edit_frequency = QLineEdit()
         self.edit_wavelength = QLineEdit()
         self.edit_observation_point_distance = QLineEdit()
+        self.edit_observation_point_height = QLineEdit()
         self.edit_observation_rotation_step = QLineEdit()
 
         self.init_layout()
         self.init_widgets()
         self.init_events()
+
+        self.model_file_picker.set_path('models/t72.obj')
+        self.excel_file_picker.set_path('output.xlsx')
 
     def init_widgets(self):
         self.edit_light_speed.setText('299792458')
@@ -33,9 +40,11 @@ class ParamsWidget(QWidget):
 
         self.edit_frequency.setText('95')
 
-        self.edit_wavelength.setText('0,1')
+        self.edit_wavelength.setEnabled(False)
+        self.update_wavelength('95')
 
         self.edit_observation_point_distance.setText('20')
+        self.edit_observation_point_height.setText('2')
 
     def init_layout(self):
         table_layout = QGridLayout()
@@ -58,14 +67,18 @@ class ParamsWidget(QWidget):
         table_layout.addWidget(QLabel(u'Відстань від ТС до об\'єкта, м'), 5, 0)
         table_layout.addWidget(self.edit_observation_point_distance, 5, 1)
 
-        table_layout.addWidget(QLabel(u'Крок повороту ТС, рад'), 6, 0)
-        table_layout.addWidget(self.edit_observation_rotation_step, 6, 1)
+        table_layout.addWidget(QLabel(u'Висота ТС, м'), 6, 0)
+        table_layout.addWidget(self.edit_observation_point_height, 6, 1)
+
+        table_layout.addWidget(QLabel(u'Крок повороту ТС, рад'), 7, 0)
+        table_layout.addWidget(self.edit_observation_rotation_step, 7, 1)
 
         self.setLayout(table_layout)
 
     def init_events(self):
         self.model_file_picker.selected.connect(self.model_file_selected)
         self.excel_file_picker.selected.connect(self.excel_file_selected)
+        self.edit_frequency.textChanged.connect(self.update_wavelength)
 
     def model_file_selected(self, model_path):
         self.model_path = model_path
@@ -78,3 +91,20 @@ class ParamsWidget(QWidget):
     def is_params_specified(self):
         return self.model_path is not None and \
             self.excel_path is not None
+
+    def get_params(self):
+        frequency = self.edit_frequency.text()
+        frequency = float(frequency) * 10 ** 9
+        return {'model_path': self.model_path,
+                'excel_path': self.excel_path,
+                'frequency': frequency}
+
+    @pyqtSlot(str)
+    def update_wavelength(self, frequency):
+        if not frequency:
+            self.edit_wavelength = str()
+            return
+        frequency = float(frequency) * 10 ** 9
+        wavelength = LIGHT_SPEED / frequency
+        wavelength = '%.4f' % wavelength
+        self.edit_wavelength.setText(wavelength)

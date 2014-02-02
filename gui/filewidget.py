@@ -42,7 +42,9 @@ class FileWidget(QWidget):
             path = QFileDialog.getSaveFileName(filter=self.files_filter)
         else:
             path = QFileDialog.getOpenFileName(filter=self.files_filter)
+        self.set_path(path)
 
+    def set_path(self, path):
         if path:
             path = str(path)
             filename = os.path.basename(path)

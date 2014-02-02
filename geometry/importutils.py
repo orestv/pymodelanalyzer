@@ -36,17 +36,30 @@ def parse_face_line(line):
     return vertex_indices
 
 
-def get_faces(path):
+def get_faces(path, update=None, cancelled=None):
     vertices = []
     faces = []
     with open(path, 'r') as objfile:
         lines = objfile.readlines()
     logger.debug('File read.')
+    line_number = 0
+    last_percentage = 0
     for line in lines:
+        if update:
+            percentage = int(100 * float(line_number) / len(lines))
+            if percentage != last_percentage:
+                update(percentage)
+                last_percentage = percentage
+                if cancelled and cancelled():
+                    logger.debug('Import cancelled')
+                    raise Exception('Import interrupted')
+        line_number += 1
         if line.startswith('v '):
             vertices.append(parse_vertex_line(line))
         elif line.startswith('f '):
             faces.append(parse_face_line(line))
+    if update:
+        update(100)
     logger.debug('Face and vertex lists created.')
     return [[vertices[i] for i in face] for face in faces]
 
