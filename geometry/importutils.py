@@ -43,11 +43,11 @@ def get_faces(path, update_percentage=None, check_cancelled=None):
         lines = objfile.readlines()
     logger.debug('File read.')
     line_number = 0
-    last_percentage = 0
+    last_percentage = -1
     for line in lines:
         if update_percentage:
             percentage = int(100 * float(line_number) / len(lines))
-            if percentage != last_percentage:
+            if percentage != last_percentage and percentage % 5 == 0:
                 update_percentage(percentage)
                 last_percentage = percentage
                 if check_cancelled:

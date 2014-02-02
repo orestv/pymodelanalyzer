@@ -1,7 +1,10 @@
 # coding=utf-8
 from PyQt4 import QtGui
+import time
+
 from PyQt4.QtCore import Qt, pyqtSlot, pyqtSignal
 from PyQt4.QtGui import QApplication, QProgressDialog
+
 from geometry import importutils
 from gui.calculator import Calculator
 from gui.paramswidget import ParamsWidget
@@ -18,6 +21,9 @@ class MainWindow(QtGui.QWidget):
         self.progress_dialog = QProgressDialog(u'', u'Зупинити',
                                                0, 100, self)
         self.progress_dialog.setWindowModality(Qt.WindowModal)
+        self.progress_dialog.setAutoClose(False)
+
+        self.progress_dialog_base_title = None
 
         self.setWindowTitle(u'Аналіз моделі')
 
@@ -55,12 +61,13 @@ class MainWindow(QtGui.QWidget):
         self.progress_dialog.setWindowTitle(title)
         self.progress_dialog.setValue(0)
 
-        calc = Calculator(target=target, args=args,
-                          clean_up_handler=self.clean_up,
+        self.calc = Calculator(target=target, args=args,
+                               clean_up_handler=self.clean_up,
                           result_handler=result_handler)
-        calc.updated.connect(self.progress_dialog.setValue)
-        self.progress_dialog.canceled.connect(calc.cancel)
-        calc.start()
+        self.calc.updated.connect(self.progress_dialog.setValue)
+        self.calc.eta_updated.connect(self.update_eta_label)
+        self.progress_dialog.canceled.connect(self.calc.cancel)
+        self.calc.start()
 
     def clean_up(self, calculator):
         pass
@@ -71,17 +78,30 @@ class MainWindow(QtGui.QWidget):
         params = self.params.get_params()
         model_path = params['model_path']
 
-        self.label_text_update_require.emit(u'Імпорт файла... ')
+        self.progress_dialog_base_title = u'Імпорт файла... '
+        self.label_text_update_require.emit('')
         faces = importutils.get_faces(model_path, update_percentage,
                                       check_cancelled)
-        self.label_text_update_require.emit(u'Перетворення трикутників... ')
+        print 'Faces imported'
+        self.progress_dialog_base_title = u'Перетворення трикутників... '
+        self.label_text_update_require.emit('')
+        self.calc.mark_process_time()
         triangles = importutils.build_triangles(faces, update_percentage,
                                                 check_cancelled)
 
     @pyqtSlot(str)
     def update_progressdialog_label(self, label):
+        if not label:
+            label = self.progress_dialog_base_title
         self.progress_dialog.setLabelText(label)
 
     @pyqtSlot(float)
-    def update_eta(self, float):
-        pass
+    def update_eta_label(self, seconds):
+        if seconds == 0:
+            self.label_text_update_require.emit('')
+            return
+        t = time.gmtime(seconds)
+        time_string = time.strftime('%M:%S', t)
+        label_text = '%s %s' % (self.progress_dialog_base_title,
+                                time_string)
+        self.label_text_update_require.emit(label_text)
